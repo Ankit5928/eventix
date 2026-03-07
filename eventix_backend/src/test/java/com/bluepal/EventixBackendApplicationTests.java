@@ -1,4 +1,4 @@
-package com.bluepal.eventix_backend;
+package com.bluepal;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
