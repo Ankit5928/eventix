@@ -1,53 +1,43 @@
-import { loadStripe } from "@stripe/stripe-js";
-import { Elements } from "@stripe/react-stripe-js";
-import { useAppSelector } from "../../store";
-import PaymentForm from "../../components/checkout/PaymentForm";
-import CheckoutSteps from "../../components/commons/CheckoutSteps";
-import { useNavigate } from "react-router-dom";
+import { useParams, Link } from 'react-router-dom';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
+import { Button } from '../../components/ui/Button';
+import { Input } from '../../components/ui/Input';
 
-// Initialize Stripe outside of component to avoid recreation
-const stripePromise = loadStripe("your_publishable_key_here");
-
-const CheckoutPage = () => {
-  const navigate = useNavigate();
-  const { clientSecret } = useAppSelector((state) => state.paymentIntent);
-
-  // 1. Create options only if clientSecret exists
-  // 2. Use a type cast or a check to satisfy Stripe's strict type
-  const options = clientSecret
-    ? {
-        clientSecret,
-        appearance: { theme: "stripe" as const },
-      }
-    : undefined;
+export default function CheckoutPage() {
+  const { reservationId } = useParams();
 
   return (
-    <div className="max-w-2xl mx-auto py-12 px-4">
-      <CheckoutSteps currentStep={3} />
-
-      <div className="mt-8">
-        <h1 className="text-2xl font-bold mb-6 text-center">
-          Complete Payment
-        </h1>
-
-        {/* Only render Elements when clientSecret is a truthy string */}
-        {clientSecret && options ? (
-          <Elements stripe={stripePromise} options={options}>
-            <PaymentForm
-              onSuccess={(id) => navigate(`/payment-success?order=${id}`)}
-            />
-          </Elements>
-        ) : (
-          <div className="flex flex-col items-center justify-center p-12 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
-            <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-            <p className="text-gray-500 font-medium">
-              Securing your checkout session...
-            </p>
+    <div className="container mx-auto px-4 py-12 max-w-3xl">
+      <Card className="animate-fade-in-up">
+        <CardHeader>
+          <CardTitle>Complete Your Reservation</CardTitle>
+          <p className="text-muted-foreground">Reservation ID: {reservationId}</p>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="space-y-4">
+            <h3 className="font-semibold text-lg">Attendee Information</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <Input label="First Name" placeholder="John" />
+              <Input label="Last Name" placeholder="Doe" />
+            </div>
+            <Input label="Email" type="email" placeholder="john@example.com" />
           </div>
-        )}
-      </div>
+
+          <div className="pt-6 border-t space-y-4">
+            <h3 className="font-semibold text-lg">Payment Details</h3>
+            <div className="p-4 bg-muted rounded-md text-sm text-center">
+              Stripe Elements integration will go here
+            </div>
+          </div>
+
+          <Button className="w-full mt-6" size="lg">Pay Now</Button>
+          <div className="text-center mt-4 text-sm">
+            <Link to="/" className="text-muted-foreground hover:text-primary transition-colors">
+              Cancel and return to event list
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
-};
-
-export default CheckoutPage;
+}

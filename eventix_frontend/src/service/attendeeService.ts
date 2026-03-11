@@ -1,56 +1,76 @@
-import axiosInstance from "../service/axiosConfig";
-import {
-  AttendeeDTO,
-  AttendeeDetailDTO,
-  AttendeeFilters,
-  PaginatedResponse,
-} from "../types/attendee.types";
+import apiClient from './api';
+import { AttendeeDTO, AttendeeDetailDTO, AttendeeFilters, PaginatedResponse } from '../types/attendee.types';
 
-const attendeeService = {
-  // GET /{eventId}/attendees
-  getEventAttendees: async (
-    eventId: number,
-    filters: AttendeeFilters,
-  ): Promise<PaginatedResponse<AttendeeDTO>> => {
-    const response = await axiosInstance.get<PaginatedResponse<AttendeeDTO>>(
-      `/events/${eventId}/attendees`,
-      {
-        params: filters,
-      },
-    );
-    return response.data;
-  },
+export const getAttendees = async (
+  eventId: number | string,
+  filters: AttendeeFilters
+): Promise<PaginatedResponse<AttendeeDTO>> => {
+  const params = new URLSearchParams();
+  
+  if (filters.search) params.append('search', filters.search);
+  if (filters.categoryId) params.append('categoryId', filters.categoryId);
+  if (filters.checkedIn) params.append('checkedIn', filters.checkedIn);
+  
+  params.append('page', filters.page.toString());
+  params.append('size', filters.size.toString());
 
-  // GET /details/{ticketId}
-  getAttendeeDetails: async (ticketId: string): Promise<AttendeeDetailDTO> => {
-    const response = await axiosInstance.get<AttendeeDetailDTO>(
-      `/events/details/${ticketId}`,
-    );
-    return response.data;
-  },
-
-  // GET /{eventId}/attendees/export
-  exportAttendees: async (
-    eventId: number,
-    filters: Omit<AttendeeFilters, "page" | "size">,
-  ): Promise<void> => {
-    const response = await axiosInstance.get(
-      `/events/${eventId}/attendees/export`,
-      {
-        params: filters,
-        responseType: "blob", // Important for file downloads
-      },
-    );
-
-    // Create a download link for the browser
-    const url = window.URL.createObjectURL(new Blob([response.data]));
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", `attendees_event_${eventId}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-  },
+  const response = await apiClient.get<PaginatedResponse<AttendeeDTO>>(
+    `/events/${eventId}/attendees`,
+    { params }
+  );
+  return response.data;
 };
 
-export default attendeeService;
+export const getAttendeeDetails = async (
+  ticketId: string
+): Promise<AttendeeDetailDTO> => {
+  const response = await apiClient.get<AttendeeDetailDTO>(
+    `/events/details/${ticketId}`
+  );
+  return response.data;
+};
+
+export const exportAttendeesCSVUrl = (
+  eventId: number | string,
+  filters: Omit<AttendeeFilters, 'page' | 'size'>
+): string => {
+  const params = new URLSearchParams();
+  
+  if (filters.search) params.append('search', filters.search);
+  if (filters.categoryId) params.append('categoryId', filters.categoryId);
+  if (filters.checkedIn) params.append('checkedIn', filters.checkedIn);
+  
+  // Need to pass token via URL or rely on cookie if using browser fetch for download.
+  // Since we use a JWT in the header, downloading CSV directly via window.open is tricky 
+  // without exposing the token or using a blob. We will use a fetch Blob approach in the UI instead.
+  
+  return `/events/${eventId}/attendees/export?${params.toString()}`;
+};
+
+export const downloadAttendeesCSV = async (
+  eventId: number | string,
+  filters: Omit<AttendeeFilters, 'page' | 'size'>
+) => {
+  const params = new URLSearchParams();
+  
+  if (filters.search) params.append('search', filters.search);
+  if (filters.categoryId) params.append('categoryId', filters.categoryId);
+  if (filters.checkedIn) params.append('checkedIn', filters.checkedIn);
+
+  const response = await apiClient.get(`/events/${eventId}/attendees/export`, {
+    params,
+    responseType: 'blob', // Important for downloading files
+  });
+
+  // Create a URL for the blob and trigger download
+  const url = window.URL.createObjectURL(new Blob([response.data]));
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', `attendees_event_${eventId}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  
+  // Cleanup
+  link.parentNode?.removeChild(link);
+  window.URL.revokeObjectURL(url);
+};

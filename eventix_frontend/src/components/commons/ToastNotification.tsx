@@ -1,39 +1,25 @@
-import React from "react";
-import { BellRing, X } from "lucide-react";
-import { SaleNotification } from "../../types/notification.types";
+import { useState } from 'react';
+import { X, CheckCircle } from 'lucide-react';
 
-interface ToastProps {
-  notification: SaleNotification;
-  onClose: () => void;
-}
+export default function ToastNotification() {
+  const [visible, setVisible] = useState(false);
 
-const ToastNotification: React.FC<ToastProps> = ({ notification, onClose }) => {
+  // In a real implementation this would listen to a global event or Redux
+  
+  if (!visible) return null;
+
   return (
-    <div className="fixed bottom-5 right-5 w-80 bg-white border-l-4 border-green-500 shadow-2xl rounded-lg p-4 animate-bounce-in">
-      <div className="flex items-start">
-        <div className="flex-shrink-0">
-          <BellRing className="h-6 w-6 text-green-500" />
+    <div className="fixed bottom-4 right-4 z-50 animate-fade-in-up">
+      <div className="bg-white dark:bg-card border border-border shadow-lg rounded-lg p-4 flex items-start gap-3 w-80">
+        <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
+        <div className="flex-1">
+          <h4 className="text-sm font-semibold">Success</h4>
+          <p className="text-xs text-muted-foreground mt-1">Action completed successfully.</p>
         </div>
-        <div className="ml-3 w-0 flex-1 pt-0.5">
-          <p className="text-sm font-bold text-gray-900">
-            New Sale! ${notification.amount}
-          </p>
-          <p className="mt-1 text-sm text-gray-500">
-            {notification.customerName} just bought tickets for{" "}
-            {notification.eventName}
-          </p>
-        </div>
-        <div className="ml-4 flex-shrink-0 flex">
-          <button
-            onClick={onClose}
-            className="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
+        <button onClick={() => setVisible(false)} className="text-muted-foreground hover:text-foreground transition-colors">
+          <X className="h-4 w-4" />
+        </button>
       </div>
     </div>
   );
-};
-
-export default ToastNotification;
+}

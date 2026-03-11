@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../store/index";
 import { fetchOrgDashboard } from "../store/slices/reportSlice";
 import StatCard from "../components/commons/StatCard";
@@ -6,16 +6,16 @@ import ProgressBar from "../components/commons/ProgressBar";
 
 const DashboardPage = () => {
   const dispatch = useAppDispatch();
-  const { user } = useAppSelector((state) => state.auth);
+  const { currentOrganizationId } = useAppSelector((state) => state.auth);
   const { orgSummary, revenueByEvent, isLoading } = useAppSelector(
     (state) => state.reports,
   );
 
   useEffect(() => {
-    if (user?.currentOrganizationId) {
-      dispatch(fetchOrgDashboard(user.currentOrganizationId));
+    if (currentOrganizationId) {
+      dispatch(fetchOrgDashboard(currentOrganizationId));
     }
-  }, [dispatch, user]);
+  }, [dispatch, currentOrganizationId]);
 
   if (isLoading) return <div className="p-8">Loading Analytics...</div>;
 
@@ -42,15 +42,15 @@ const DashboardPage = () => {
       </div>
 
       {/* Revenue Breakdown */}
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+      <div className="bg-white dark:bg-card p-6 rounded-xl shadow-sm border">
         <h2 className="text-lg font-semibold mb-6">Revenue by Event</h2>
         <div className="space-y-4">
-          {revenueByEvent.map((item) => (
+          {revenueByEvent.map((item: any) => (
             <ProgressBar
               key={item.eventId}
               label={item.eventTitle}
               current={item.totalRevenue}
-              total={orgSummary?.totalRevenue || 1} // Prevent div by zero
+              total={orgSummary?.totalRevenue || 1}
               color="bg-blue-500"
             />
           ))}

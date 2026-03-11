@@ -1,57 +1,60 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import authService from "../../service/authService";
-import { LoginResponse, LoginRequest } from "../../types/auth.types";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+
+interface User {
+  id: string;
+  email: string;
+  roles: string[];
+}
 
 interface AuthState {
-  user: LoginResponse | null;
-  isLoading: boolean;
-  error: string | null;
+  token: string | null;
+  user: User | null;
+  isAuthenticated: boolean;
+  currentOrganizationId: string | null;
+  organizationIds: string[];
 }
 
 const initialState: AuthState = {
-  user: JSON.parse(localStorage.getItem("user") || "null"),
-  isLoading: false,
-  error: null,
+  token: localStorage.getItem('token'),
+  user: null, // In a real app we'd decode the JWT to get the user info initially
+  isAuthenticated: !!localStorage.getItem('token'),
+  currentOrganizationId: localStorage.getItem('currentOrganizationId'),
+  organizationIds: [],
 };
 
-export const loginUser = createAsyncThunk(
-  "auth/login",
-  async (credentials: LoginRequest, thunkAPI) => {
-    try {
-      const data = await authService.login(credentials);
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data));
-      return data;
-    } catch (err: any) {
-      return thunkAPI.rejectWithValue(err.response?.data || "Login failed");
-    }
-  },
-);
-
 const authSlice = createSlice({
-  name: "auth",
+  name: 'auth',
   initialState,
   reducers: {
-    logout: (state) => {
-      authService.logout();
-      state.user = null;
+    setCredentials: (
+      state,
+      action: PayloadAction<{ token: string; user: User; organizationIds: string[] }>
+    ) => {
+      state.token = action.payload.token;
+      state.user = action.payload.user;
+      state.isAuthenticated = true;
+      state.organizationIds = action.payload.organizationIds;
+      if (action.payload.organizationIds.length > 0) {
+        state.currentOrganizationId = action.payload.organizationIds[0];
+        localStorage.setItem('currentOrganizationId', state.currentOrganizationId);
+      }
+      localStorage.setItem('token', action.payload.token);
     },
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(loginUser.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(loginUser.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.user = action.payload;
-      })
-      .addCase(loginUser.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload as string;
-      });
+    logout: (state) => {
+      state.token = null;
+      state.user = null;
+      state.isAuthenticated = false;
+      state.currentOrganizationId = null;
+      state.organizationIds = [];
+      localStorage.removeItem('token');
+      localStorage.removeItem('currentOrganizationId');
+    },
+    switchOrganization: (state, action: PayloadAction<string>) => {
+      state.currentOrganizationId = action.payload;
+      localStorage.setItem('currentOrganizationId', action.payload);
+    },
   },
 });
 
-export const { logout } = authSlice.actions;
+export const { setCredentials, logout, switchOrganization } = authSlice.actions;
 export default authSlice.reducer;

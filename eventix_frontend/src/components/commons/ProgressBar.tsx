@@ -1,65 +1,27 @@
-import React from "react";
+import { cn } from '../ui/Button';
 
 interface ProgressBarProps {
-  label?: string;
+  label: string;
   current: number;
   total: number;
-  showPercentage?: boolean;
-  color?: string; // Tailwind bg class like "bg-blue-600"
-  size?: "sm" | "md" | "lg";
+  color?: string;
 }
 
-const ProgressBar: React.FC<ProgressBarProps> = ({
-  label,
-  current,
-  total,
-  showPercentage = true,
-  color = "bg-blue-600",
-  size = "md",
-}) => {
-  // Calculate percentage safely
-  const percentage =
-    total > 0 ? Math.min(Math.round((current / total) * 100), 100) : 0;
-
-  const heightClasses = {
-    sm: "h-1.5",
-    md: "h-2.5",
-    lg: "h-4",
-  };
-
+export default function ProgressBar({ label, current, total, color = "bg-primary" }: ProgressBarProps) {
+  const percentage = total > 0 ? Math.round((current / total) * 100) : 0;
+  
   return (
-    <div className="w-full">
-      <div className="flex justify-between items-end mb-1.5">
-        {label && (
-          <span className="text-sm font-semibold text-gray-700">{label}</span>
-        )}
-        {showPercentage && (
-          <span className="text-xs font-bold text-gray-500">{percentage}%</span>
-        )}
+    <div className="space-y-2">
+      <div className="flex justify-between text-sm">
+        <span className="font-medium">{label}</span>
+        <span className="text-muted-foreground">${current.toLocaleString()} ({percentage}%)</span>
       </div>
-
-      {/* Outer Track */}
-      <div
-        className={`w-full bg-gray-200 rounded-full overflow-hidden ${heightClasses[size]}`}
-      >
-        {/* Inner Fill */}
-        <div
-          className={`h-full rounded-full transition-all duration-700 ease-out ${color}`}
+      <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+        <div 
+          className={cn("h-full rounded-full transition-all duration-1000 ease-out", color)} 
           style={{ width: `${percentage}%` }}
-          role="progressbar"
-          aria-valuenow={percentage}
-          aria-valuemin={0}
-          aria-valuemax={100}
         />
-      </div>
-
-      <div className="mt-1 flex justify-between">
-        <span className="text-[10px] text-gray-400 font-medium">
-          {current.toLocaleString()} / {total.toLocaleString()}
-        </span>
       </div>
     </div>
   );
-};
-
-export default ProgressBar;
+}

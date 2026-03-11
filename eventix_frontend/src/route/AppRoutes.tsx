@@ -5,9 +5,13 @@ import { useAppSelector } from "../store/index";
 import MainLayout from "../components/layouts/MainLayout";
 import PublicLayout from "../components/layouts/PublicLayout";
 
-// Pages (You will create these next)
+// Pages
 import LoginPage from "../components/auth/LoginPage";
+import RegisterPage from "../pages/auth/RegisterPage";
 import DashboardPage from "../pages/DashboardPage";
+import EventsPage from "../pages/EventsPage";
+import AttendeesPage from "../pages/AttendeesPage";
+import SettingsPage from "../pages/SettingsPage";
 import EventListingPage from "../pages/public/EventListingPage";
 import EventDetailPage from "../pages/public/EventDetailPage";
 import CheckoutPage from "../pages/public/CheckoutPage";
@@ -29,11 +33,17 @@ const AppRoutes = () => {
         path="/login"
         element={!user ? <LoginPage /> : <Navigate to="/dashboard" />}
       />
+      <Route
+        path="/register"
+        element={!user ? <RegisterPage /> : <Navigate to="/dashboard" />}
+      />
 
       {/* PROTECTED ROUTES (Organizer View) */}
       <Route element={user ? <MainLayout /> : <Navigate to="/login" />}>
         <Route path="/dashboard" element={<DashboardPage />} />
-        {/* We will add Events, Attendees, and Settings here later */}
+        <Route path="/events" element={<EventsPage />} />
+        <Route path="/events/:eventId/attendees" element={<AttendeesPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
       </Route>
     </Routes>
   );
