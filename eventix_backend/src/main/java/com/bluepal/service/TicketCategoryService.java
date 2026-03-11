@@ -87,7 +87,7 @@ public class TicketCategoryService {
      * EM-TICKET-003-T7: Logic to release tickets back to inventory.
      */
     @Transactional
-    public void incrementAvailability(Long categoryId, Integer quantity) {
+    public void incrementAvailability(UUID categoryId, Integer quantity) {
         int rowsAffected = categoryRepository.incrementAvailability(categoryId, quantity);
 
         if (rowsAffected == 0) {

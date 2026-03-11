@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 public class ReservationRequest {
@@ -15,7 +16,7 @@ public class ReservationRequest {
     @Data
     public static class TicketItemRequest {
         @NotNull(message = "Ticket category ID is required")
-        private Long ticketCategoryId;
+        private UUID ticketCategoryId;
 
         @Min(value = 1, message = "Quantity must be at least 1")
         private Integer quantity;

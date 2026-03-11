@@ -35,7 +35,7 @@ public class ReservationController {
 
         ReservationResponse response = new ReservationResponse();
         response.setReservationId(reservation.getId());
-        response.setExpiresAt(reservation.getExpiresAt().toString());
+        response.setExpiresAt(reservation.getExpiresAt());
         response.setStatus(reservation.getStatus().toString());
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);

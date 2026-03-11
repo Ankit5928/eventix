@@ -22,6 +22,7 @@ public class ReservationResponse {
     private Double totalAmount;
     private List<ItemDto> items;
 
+
     @Data
     @Builder
     public static class ItemDto {
