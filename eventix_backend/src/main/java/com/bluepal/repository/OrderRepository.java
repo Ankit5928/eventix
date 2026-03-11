@@ -19,18 +19,19 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
     Order findByReservationId(UUID id);
 
     // Add to OrderRepository.java
+// 1. Fix the Revenue Report Query
     @Query("SELECT new com.bluepal.dto.response.RevenueReportDTO(" +
-            "e.id, e.title, SUM(o.totalAmount), COUNT(t.id), AVG(o.totalAmount/1)) " +
+            "e.id, e.title, SUM(o.totalAmount), COUNT(i.id), AVG(o.totalAmount)) " +
             "FROM Order o " +
             "JOIN o.reservation r " +
             "JOIN r.event e " +
-            "JOIN o.tickets t " +
+            "JOIN o.items i " + // Changed o.tickets -> o.items
             "WHERE e.organization.id = :orgId " +
-            "AND o.status = 'CONFIRMED' " + // T8: Only confirmed revenue
-            "AND (:startDate IS NULL OR o.createdAt >= :startDate) " + // T15: Date filters
+            "AND o.status = 'CONFIRMED' " +
+            "AND (:startDate IS NULL OR o.createdAt >= :startDate) " +
             "AND (:endDate IS NULL OR o.createdAt <= :endDate) " +
             "GROUP BY e.id, e.title " +
-            "ORDER BY SUM(o.totalAmount) DESC") // T10: Highest revenue first
+            "ORDER BY SUM(o.totalAmount) DESC")
     List<RevenueReportDTO> getRevenueReportByOrganization(
             @Param("orgId") Long orgId,
             @Param("startDate") LocalDateTime startDate,
@@ -57,18 +58,21 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
             @Param("end") LocalDateTime end
     );
 
-    // Add to OrderRepository.java
+    // 2. Fix the Top Selling Events Query (The one from your latest log)
     @Query("SELECT new com.bluepal.dto.response.RevenueReportDTO(" +
-            "e.id, e.title, SUM(o.totalAmount), COUNT(t.id), AVG(o.totalAmount/1)) " +
+            "e.id, e.title, SUM(o.totalAmount), COUNT(i.id), AVG(o.totalAmount)) " +
             "FROM Order o " +
             "JOIN o.reservation r " +
             "JOIN r.event e " +
-            "JOIN o.tickets t " +
+            "JOIN o.items i " + // Changed o.tickets -> o.items
             "WHERE e.organization.id = :orgId " +
             "AND o.status = 'CONFIRMED' " +
             "GROUP BY e.id, e.title " +
-            "ORDER BY COUNT(t.id) DESC") // T3: Sort by volume (Tickets Sold)
-    List<RevenueReportDTO> findTopSellingEvents(@Param("orgId") Long orgId, Pageable pageable);
+            "ORDER BY COUNT(i.id) DESC") // Highest ticket count first
+    List<RevenueReportDTO> findTopSellingEvents(
+            @Param("orgId") Long orgId,
+            Pageable pageable
+    );
 
     // T4: Aggregate total revenue from confirmed orders
     @Query("SELECT SUM(o.totalAmount) FROM Order o WHERE o.reservation.event.id = :eventId AND o.status = 'CONFIRMED'")

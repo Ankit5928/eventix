@@ -23,58 +23,32 @@ public class AttendeeController {
     private final CSVExportService csvExportService;
 
     /**
-     * T8-T12: Returns a paginated list of attendees for an event.
+     * UNIFIED ATTENDEE LIST (T4-T12)
+     * This single method replaces all previous versions of getAttendees.
+     * It handles:
+     * 1. Basic pagination
+     * 2. Keyword Search (search)
+     * 3. Ticket Category filtering (categoryId)
+     * 4. Check-in status filtering (checkedIn)
      */
-    @GetMapping("/{eventId}/attendees")
-    @PreAuthorize("hasRole('ORGANIZER')")
-    public ResponseEntity<Page<AttendeeDTO>> getAttendees(
-            @PathVariable Long eventId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "50") int size) {
-
-        return ResponseEntity.ok(attendeeService.getEventAttendees(eventId, page, size));
-    }
-
-    // Update AttendeeController.java
-    @GetMapping("/{eventId}/attendees")
-    @PreAuthorize("hasRole('ORGANIZER')")
-    public ResponseEntity<Page<AttendeeDTO>> getAttendees(
-            @PathVariable Long eventId,
-            @RequestParam(required = false) String search, // T6: Added search param
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "50") int size) {
-
-        return ResponseEntity.ok(attendeeService.getEventAttendees(eventId, search, page, size));
-    }
-
-    // Update AttendeeController.java
-    @GetMapping("/{eventId}/attendees")
-    @PreAuthorize("hasRole('ORGANIZER')")
-    public ResponseEntity<Page<AttendeeDTO>> getAttendees(
-            @PathVariable Long eventId,
-            @RequestParam(required = false) String search,
-            @RequestParam(required = false) UUID categoryId, // T4: Added category filter
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "50") int size) {
-
-        return ResponseEntity.ok(attendeeService.getEventAttendees(eventId, search, categoryId, page, size));
-    }
-
-    // Update AttendeeController.java
     @GetMapping("/{eventId}/attendees")
     @PreAuthorize("hasRole('ORGANIZER')")
     public ResponseEntity<Page<AttendeeDTO>> getAttendees(
             @PathVariable Long eventId,
             @RequestParam(required = false) String search,
             @RequestParam(required = false) UUID categoryId,
-            @RequestParam(required = false) String checkedIn, // T4: Accept ?checkedIn=checked_in
+            @RequestParam(required = false) String checkedIn,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size) {
 
+        // All parameters are passed to a single service method
         return ResponseEntity.ok(attendeeService.getEventAttendees(eventId, search, categoryId, checkedIn, page, size));
     }
 
-    // Add to AttendeeController.java
+    /**
+     * ATTENDEE EXPORT (T10-T14)
+     * Exports the filtered list of attendees to a CSV file.
+     */
     @GetMapping("/{eventId}/attendees/export")
     @PreAuthorize("hasRole('ORGANIZER')")
     public ResponseEntity<byte[]> exportAttendees(
@@ -83,27 +57,27 @@ public class AttendeeController {
             @RequestParam(required = false) UUID categoryId,
             @RequestParam(required = false) String checkedIn) {
 
-        // Convert status string to Boolean for the service
+        // Logic to convert the status string to Boolean for the CSV service
         Boolean checkedInFilter = null;
         if ("checked_in".equalsIgnoreCase(checkedIn)) checkedInFilter = true;
         else if ("not_checked_in".equalsIgnoreCase(checkedIn)) checkedInFilter = false;
 
-        // T10: Generate the CSV content
         String csvData = csvExportService.exportAttendeesToCSV(eventId, search, categoryId, checkedInFilter);
         byte[] content = csvData.getBytes();
 
-        // T13-T14: Set headers for file download
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=attendees_event_" + eventId + ".csv")
                 .contentType(MediaType.parseMediaType("text/csv"))
                 .body(content);
     }
 
-    // Add to AttendeeController.java
+    /**
+     * ATTENDEE DETAILS (T9)
+     * Fetches detailed information for a specific ticket.
+     */
     @GetMapping("/details/{ticketId}")
     @PreAuthorize("hasRole('ORGANIZER')")
     public ResponseEntity<AttendeeDetailDTO> getAttendeeDetails(@PathVariable UUID ticketId) {
-        // T9: (Logic for verifying organizer access to the event would be handled here or in Service)
         return ResponseEntity.ok(attendeeService.getAttendeeDetails(ticketId));
     }
 }

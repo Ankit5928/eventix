@@ -23,26 +23,9 @@ public class PublicEventController {
     private final EventService eventService;
     private final ReservationService reservationService;
 
-    /**
-     * T4-T8: Publicly accessible list of upcoming events.
-     */
-    @GetMapping
-    public ResponseEntity<Page<PublicEventDTO>> getAllPublicEvents(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "12") int size) {
 
-        return ResponseEntity.ok(eventService.getPublicEvents(page, size));
-    }
 
-    // Update PublicEventController.java
-    @GetMapping
-    public ResponseEntity<Page<PublicEventDTO>> getAllPublicEvents(
-            @RequestParam(required = false) String search, // T3: Accept ?search=
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "12") int size) {
 
-        return ResponseEntity.ok(eventService.getPublicEvents(search, page, size));
-    }
 
     // Inside PublicEventController.java
     /**
@@ -71,7 +54,6 @@ public class PublicEventController {
         return ResponseEntity.ok(response);
     }
 
-    // Update PublicEventController.java
     @GetMapping
     public ResponseEntity<Page<PublicEventDTO>> getAllPublicEvents(
             @RequestParam(required = false) String search,
@@ -80,7 +62,8 @@ public class PublicEventController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size) {
 
-        // T4: Route to filtered service
+        // Route to the service method that handles all optional filters
         return ResponseEntity.ok(eventService.getPublicEvents(search, startDate, endDate, page, size));
     }
+
 }

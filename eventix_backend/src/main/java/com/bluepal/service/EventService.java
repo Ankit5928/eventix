@@ -16,6 +16,7 @@ import com.bluepal.repository.TicketCategoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aot.generate.AccessControl;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +31,9 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class EventService {
+
+    @Value("${encryption.master-key}")
+    private String masterKey;
 
     private final EventRepository eventRepository;
     private final OrganizationRepository organizationRepository;
