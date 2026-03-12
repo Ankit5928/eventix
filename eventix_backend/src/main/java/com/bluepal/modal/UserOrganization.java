@@ -13,6 +13,7 @@ import lombok.*;
 public class UserOrganization {
 
     @EmbeddedId
+    @Builder.Default
     private UserOrganizationId id = new UserOrganizationId();   // ⭐ IMPORTANT FIX
 
     @ManyToOne
@@ -25,6 +26,7 @@ public class UserOrganization {
     @JoinColumn(name = "organization_id")
     private Organization organization;
 
-    @Column(nullable = false)
-    private String role;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 50)
+    private Role role;
 }

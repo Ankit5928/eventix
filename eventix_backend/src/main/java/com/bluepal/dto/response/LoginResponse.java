@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import com.bluepal.modal.Role;
 import java.util.List;
 
 @Data
@@ -32,5 +33,5 @@ public class LoginResponse {
     /**
      * The primary role of the user (e.g., 'OWNER', 'ORGANIZER').
      */
-    private String role;
+    private Role role;
 }

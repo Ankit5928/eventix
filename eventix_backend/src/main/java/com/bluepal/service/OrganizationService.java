@@ -6,20 +6,25 @@ import com.bluepal.dto.request.AddUserRequest;
 import com.bluepal.dto.request.StripeConfigRequest;
 import com.bluepal.dto.response.OrganizationResponse;
 import com.bluepal.modal.Organization;
+import com.bluepal.modal.PasswordResetToken;
 import com.bluepal.modal.User;
 import com.bluepal.modal.UserOrganization;
+import com.bluepal.modal.Role;
 import com.bluepal.repository.OrganizationRepository;
+import com.bluepal.repository.PasswordResetTokenRepository;
 import com.bluepal.repository.UserOrganizationRepository;
 import com.bluepal.repository.UserRepository;
 import com.bluepal.security.EncryptionService;
 import com.bluepal.security.OrganizationContextHolder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.AccessDeniedException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -32,7 +37,9 @@ public class OrganizationService {
     private final OrganizationRepository organizationRepository;
     private final UserRepository userRepository;
     private final UserOrganizationRepository userOrgRepository;
-    private final PasswordEncoder  passwordEncoder;
+    private final PasswordResetTokenRepository tokenRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
     private final EncryptionService encryptionService;
 
     @Transactional(readOnly = true)
@@ -73,11 +80,28 @@ public class OrganizationService {
         Organization org = organizationRepository.findById(orgId)
                 .orElseThrow(() -> new RuntimeException("Organization not found"));
 
-        // EM-AUTH-005-T4: Check if user exists
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseGet(() -> createNewUser(request.getEmail()));
+        // EM-AUTH-005-T11: Find user or create if they don't exist
+        String email = request.getEmail();
+        User user = userRepository.findByEmail(email).orElse(null);
+        boolean isNewUser = false;
 
-        // EM-AUTH-005-T5: Prevent duplicate association
+        // Parse Role Enum safely first so we can use it to set the base user role
+        Role assignedRole;
+        try {
+            assignedRole = Role.valueOf(request.getRole().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid role specified");
+        }
+
+        if (user == null) {
+            user = new User();
+            user.setEmail(email);
+            user.setRole(assignedRole); // Sync Global Role with Organization Role
+            user = userRepository.save(user);
+            isNewUser = true;
+        }
+
+        // EM-AUTH-005-T12: Check if user already in organization
         if (userOrgRepository.existsByUserAndOrganization(user, org)) {
             throw new RuntimeException("User is already a member of this organization");
         }
@@ -86,28 +110,32 @@ public class OrganizationService {
         UserOrganization association = UserOrganization.builder()
                 .user(user)
                 .organization(org)
-                .role(request.getRole())
+                .role(assignedRole)
                 .build();
 
         userOrgRepository.save(association);
-        log.info("User {} added to Organization {} as {}", user.getEmail(), org.getName(), request.getRole());
+        log.info("User {} added to Organization {} as {}", user.getEmail(), org.getName(), assignedRole);
+        
+        // --- NEW INVITE EMAIL LOGIC ---
+        String inviterEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        String token = UUID.randomUUID().toString();
+        
+        // Set expiry for 7 days
+        PasswordResetToken resetToken = PasswordResetToken.builder()
+            .token(token)
+            .user(user)
+            .expiryDate(LocalDateTime.now().plusDays(7))
+            .build();
+            
+        tokenRepository.save(resetToken);
+        emailService.sendInviteEmail(email, token, org.getName(), inviterEmail);
+        // ------------------------------
+
         return UserDTO.builder()
                 .id(user.getId())
                 .email(user.getEmail())
-                .role(request.getRole())
+                .role(assignedRole)
                 .build();
-    }
-
-    private User createNewUser(String email) {
-        // EM-AUTH-005-T6 & T7: Create new user with secure temporary password
-        String tempPassword = UUID.randomUUID().toString().substring(0, 12);
-
-        User newUser = new User();
-        newUser.setEmail(email);
-        newUser.setPasswordHash(passwordEncoder.encode(tempPassword));
-
-        log.info("EM-AUTH-005-T13: Placeholder - Email would be sent to {} with temp password: {}", email, tempPassword);
-        return userRepository.save(newUser);
     }
 
     public void updateStripeConfig(Long orgId, StripeConfigRequest request) throws Exception {

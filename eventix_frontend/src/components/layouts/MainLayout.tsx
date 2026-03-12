@@ -29,7 +29,6 @@ export default function MainLayout() {
   const navItems = [
     { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { label: 'Events', path: '/events', icon: Calendar },
-    { label: 'Attendees', path: '/attendees', icon: Users },
     { label: 'Settings', path: '/settings', icon: Settings },
   ];
 

@@ -5,11 +5,15 @@ package com.bluepal.service;
 import com.bluepal.dto.request.LoginRequest;
 import com.bluepal.dto.request.RegisterRequest;
 import com.bluepal.dto.request.SwitchOrganizationRequest;
+import com.bluepal.dto.request.SetPasswordRequest;
 import com.bluepal.dto.response.LoginResponse;
 import com.bluepal.modal.Organization;
+import com.bluepal.modal.PasswordResetToken;
 import com.bluepal.modal.User;
 import com.bluepal.modal.UserOrganization;
+import com.bluepal.modal.Role;
 import com.bluepal.repository.OrganizationRepository;
+import com.bluepal.repository.PasswordResetTokenRepository;
 import com.bluepal.repository.UserOrganizationRepository;
 import com.bluepal.repository.UserRepository;
 import com.bluepal.security.JwtUtil;
@@ -32,6 +36,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final OrganizationRepository organizationRepository;
     private final UserOrganizationRepository userOrganizationRepository;
+    private final PasswordResetTokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
@@ -54,13 +59,14 @@ public class AuthService {
         User user = new User();
         user.setEmail(request.getOwnerEmail());
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        user.setRole(Role.OWNER); // Set Global User Role
         user = userRepository.save(user);
 
         // 3. Create Association in Junction Table (Task T16: Atomic)
         UserOrganization association = new UserOrganization();
         association.setUser(user);
         association.setOrganization(organization);
-        association.setRole("OWNER");
+        association.setRole(Role.OWNER);
         userOrganizationRepository.save(association);
     }
 
@@ -80,17 +86,23 @@ public class AuthService {
                 .collect(Collectors.toList());
 
         List<String> roles = user.getUserOrganizations().stream()
-                .map(uo -> uo.getRole())
+                .map(uo -> uo.getRole().name())
                 .distinct()
                 .collect(Collectors.toList());
 
         // EM-AUTH-002-T13: Generate the token (valid for 24 hours)
         String token = jwtUtil.generateToken(user.getEmail(), orgIds, roles);
 
+        Role primaryRole = user.getRole();
+        if (user.getUserOrganizations() != null && !user.getUserOrganizations().isEmpty()) {
+            primaryRole = user.getUserOrganizations().get(0).getRole();
+        }
+
         return LoginResponse.builder()
                 .token(token)
                 .userId(user.getId())
                 .organizationIds(orgIds)
+                .role(primaryRole)
                 .build();
     }
     public LoginResponse switchOrganization(SwitchOrganizationRequest request) throws AccessDeniedException {
@@ -116,7 +128,7 @@ public class AuthService {
                 user.getEmail(),
                 targetOrg.getOrganization().getId(),
                 orgIds,
-                List.of(targetOrg.getRole())
+                List.of(targetOrg.getRole().name())
         );
 
 
@@ -129,6 +141,21 @@ public class AuthService {
                 .build();
     }
 
+    @Transactional
+    public void setPassword(SetPasswordRequest request) {
+        PasswordResetToken resetToken = tokenRepository.findByToken(request.getToken())
+                .orElseThrow(() -> new RuntimeException("Invalid or expired token"));
 
+        if (resetToken.isExpired()) {
+            tokenRepository.delete(resetToken);
+            throw new RuntimeException("Token has expired");
+        }
 
+        User user = resetToken.getUser();
+        user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+
+        // Clean up all tokens for this user once they set their password
+        tokenRepository.deleteByUser(user);
+    }
 }
