@@ -2,6 +2,7 @@ package com.bluepal.controller;
 
 import com.bluepal.dto.request.LoginRequest;
 import com.bluepal.dto.request.RegisterRequest;
+import com.bluepal.dto.request.SetPasswordRequest;
 import com.bluepal.dto.request.SwitchOrganizationRequest;
 import com.bluepal.dto.response.LoginResponse;
 import com.bluepal.service.AuthService;
@@ -45,5 +46,11 @@ public class AuthController {
 
         LoginResponse response = authService.switchOrganization(request);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/set-password")
+    public ResponseEntity<String> setPassword(@Valid @RequestBody SetPasswordRequest request) {
+        authService.setPassword(request);
+        return ResponseEntity.ok("Password successfully set");
     }
 }

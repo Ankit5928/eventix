@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.function.Function;
 
 @Component
@@ -73,10 +74,16 @@ public class JwtUtil {
         return (orgIds != null && !orgIds.isEmpty()) ? orgIds.get(0) : null;
     }
 
-    @SuppressWarnings("unchecked")
     public List<Long> extractOrgIds(String token) {
         final Claims claims = extractAllClaims(token);
-        return (claims != null) ? (List<Long>) claims.get("orgIds") : null;
+        if (claims == null) return null;
+        Object orgIdsObj = claims.get("orgIds");
+        if (orgIdsObj instanceof List) {
+            return ((List<?>) orgIdsObj).stream()
+                    .map(id -> Long.valueOf(id.toString()))
+                    .collect(Collectors.toList());
+        }
+        return null;
     }
 
     @SuppressWarnings("unchecked")

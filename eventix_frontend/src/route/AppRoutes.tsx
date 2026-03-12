@@ -8,6 +8,7 @@ import PublicLayout from "../components/layouts/PublicLayout";
 // Pages
 import LoginPage from "../components/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
+import SetPasswordPage from "../pages/auth/SetPasswordPage";
 import DashboardPage from "../pages/DashboardPage";
 import EventsPage from "../pages/EventsPage";
 import AttendeesPage from "../pages/AttendeesPage";
@@ -36,6 +37,10 @@ const AppRoutes = () => {
       <Route
         path="/register"
         element={!user ? <RegisterPage /> : <Navigate to="/dashboard" />}
+      />
+      <Route
+        path="/set-password"
+        element={!user ? <SetPasswordPage /> : <Navigate to="/dashboard" />}
       />
 
       {/* PROTECTED ROUTES (Organizer View) */}

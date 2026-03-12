@@ -26,6 +26,10 @@ public class User {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
+    @Enumerated(EnumType.STRING)
+    @Column(length = 50)
+    private Role role;
+
     // Inside User.java
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserOrganization> userOrganizations = new ArrayList<>();

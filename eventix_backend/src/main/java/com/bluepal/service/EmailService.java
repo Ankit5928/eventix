@@ -172,4 +172,40 @@ public class EmailService {
                 "</body>" +
                 "</html>";
     }
+
+    @Async
+    public void sendInviteEmail(String toEmail, String token, String orgName, String inviterEmail) {
+        log.info("Sending invite email to {} for organization {}", toEmail, orgName);
+        
+        try {
+            Context context = new Context();
+            context.setVariable("orgName", orgName);
+            context.setVariable("inviterEmail", inviterEmail);
+            
+            // Build the frontend Set-Password URL
+            String setPasswordUrl = "http://localhost:5173/set-password?token=" + token;
+            context.setVariable("inviteLink", setPasswordUrl);
+            
+            String process = templateEngine.process("invite-email", context);
+            
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            
+            helper.setTo(toEmail);
+            helper.setSubject("You've been invited to join " + orgName + " on Eventix!");
+            helper.setText(process, true); // true = HTML
+            
+            // For now, only log if mail fails since they might not have real credentials yet
+            try {
+                mailSender.send(mimeMessage);
+                log.info("Email sent successfully to {}", toEmail);
+            } catch (Exception e) {
+                log.warn("Failed to actually send email via SMTP. If testing locally without real credentials, here is the link: {}", setPasswordUrl);
+                log.error("Mail Error:", e);
+            }
+            
+        } catch (MessagingException e) {
+            log.error("Failed to generate HTML email for {}", toEmail, e);
+        }
+    }
 }
