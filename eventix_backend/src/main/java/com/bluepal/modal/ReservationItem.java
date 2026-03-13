@@ -10,8 +10,10 @@ import java.util.UUID;
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 @Builder
 public class ReservationItem {
+
     @Id
-    private UUID id = UUID.randomUUID();
+    @GeneratedValue
+    private UUID id;
 
     @ManyToOne
     @JoinColumn(name = "reservation_id")

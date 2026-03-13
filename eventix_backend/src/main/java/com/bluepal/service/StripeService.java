@@ -1,10 +1,9 @@
 package com.bluepal.service;
 
-
-
 import com.bluepal.modal.Reservation;
 import com.bluepal.repository.ReservationRepository;
 import com.stripe.Stripe;
+import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
 import jakarta.annotation.PostConstruct;
@@ -13,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -25,45 +25,112 @@ public class StripeService {
     @Value("${stripe.api.key}")
     private String stripeApiKey;
 
+    @Value("${stripe.publishable.key}")
+    private String stripePublishableKey;
+
     @PostConstruct
     public void init() {
+
+        if (stripeApiKey == null || stripeApiKey.isBlank()) {
+            throw new IllegalStateException("Stripe API key is not configured!");
+        }
+
+        if (stripePublishableKey == null || stripePublishableKey.isBlank()) {
+            throw new IllegalStateException("Stripe publishable key is not configured!");
+        }
+
         Stripe.apiKey = stripeApiKey;
-        log.info("Stripe API key initialized for Eventix");
+
+        log.info("Stripe initialized successfully");
     }
 
     public String createCheckoutSession(UUID reservationId) {
+
         try {
-            Reservation reservation = reservationRepository.findById(reservationId)
+
+            log.info("Creating Stripe checkout session for reservation: {}", reservationId);
+
+            Reservation reservation = reservationRepository
+                    .findById(reservationId)
                     .orElseThrow(() -> new RuntimeException("Reservation not found"));
 
-            log.info("Creating Stripe session for Reservation {}", reservationId);
+            if (reservation.getEvent() == null) {
+                throw new RuntimeException("Event not found for reservation");
+            }
 
-            SessionCreateParams params = SessionCreateParams.builder()
-                    .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
-                    .setMode(SessionCreateParams.Mode.PAYMENT)
-                    // Success/Cancel URLs point back to your Angular app
-                    .setSuccessUrl("http://localhost:4200/checkout/success?id=" + reservationId)
-                    .setCancelUrl("http://localhost:4200/checkout/cancel")
-                    .addLineItem(SessionCreateParams.LineItem.builder()
-                            .setPriceData(SessionCreateParams.LineItem.PriceData.builder()
-                                    .setCurrency("usd")
-                                    .setUnitAmount((long) (reservation.calculateTotal() * 100)) // Amount in cents
-                                    .setProductData(SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                                            .setName("Tickets for " + reservation.getEvent().getTitle())
+            // Safe event title
+            String eventTitle = Optional.ofNullable(reservation.getEvent().getTitle())
+                    .filter(title -> !title.isBlank())
+                    .orElse("Event Ticket");
+
+            // Safe amount calculation
+            double total = reservation.calculateTotal();
+
+            if (total <= 0) {
+                throw new RuntimeException("Invalid reservation amount");
+            }
+
+            long amount = Math.round(total * 100); // Stripe expects cents
+
+            log.info("Event title: {}", eventTitle);
+            log.info("Amount (cents): {}", amount);
+
+            SessionCreateParams params =
+                    SessionCreateParams.builder()
+
+                            .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
+
+                            .setMode(SessionCreateParams.Mode.PAYMENT)
+
+                            .setSuccessUrl(
+                                    "http://localhost:4200/checkout/success?reservationId="
+                                            + reservationId)
+
+                            .setCancelUrl(
+                                    "http://localhost:4200/checkout/cancel")
+
+                            .addLineItem(
+                                    SessionCreateParams.LineItem.builder()
+
+                                            .setQuantity(1L)
+
+                                            .setPriceData(
+                                                    SessionCreateParams.LineItem.PriceData.builder()
+
+                                                            .setCurrency("usd")
+
+                                                            .setUnitAmount(amount)
+
+                                                            .setProductData(
+                                                                    SessionCreateParams.LineItem.PriceData.ProductData.builder()
+
+                                                                            .setName("Tickets for " + eventTitle)
+
+                                                                            .build())
+
+                                                            .build())
+
                                             .build())
-                                    .build())
-                            .setQuantity(1L)
-                            .build())
-                    // Metadata is critical for the Webhook to find the reservation later
-                    .putMetadata("reservation_id", reservationId.toString())
-                    .build();
+
+                            .putMetadata("reservation_id", reservationId.toString())
+
+                            .build();
 
             Session session = Session.create(params);
+
+            log.info("Stripe session created successfully: {}", session.getId());
+
             return session.getId();
 
+        } catch (StripeException e) {
+
+            log.error("Stripe API error", e);
+            throw new RuntimeException("Stripe API Error: " + e.getMessage());
+
         } catch (Exception e) {
+
             log.error("Failed to create Stripe session", e);
-            throw new RuntimeException("Stripe Session Error", e);
+            throw new RuntimeException("Stripe Session Error: " + e.getMessage());
         }
     }
 }

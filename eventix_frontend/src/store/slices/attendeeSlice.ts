@@ -1,10 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import attendeeService from "../../service/attendeeService";
-import {
-  AttendeeDTO,
-  AttendeeFilters,
-  PaginatedResponse,
-} from "../../types/attendee.types";
+import { getAttendees as attendeeService } from "../../service/attendeeService";
+import { AttendeeDTO, AttendeeFilters } from "../../types/attendee.types";
 
 interface AttendeeState {
   attendees: AttendeeDTO[];
@@ -31,7 +27,7 @@ export const fetchAttendees = createAsyncThunk(
     thunkAPI,
   ) => {
     try {
-      return await attendeeService.getEventAttendees(eventId, filters);
+      return await attendeeService(eventId, filters);
     } catch (err: any) {
       return thunkAPI.rejectWithValue(
         err.response?.data || "Failed to fetch attendees",

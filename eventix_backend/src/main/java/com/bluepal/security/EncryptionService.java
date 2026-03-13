@@ -2,6 +2,7 @@ package com.bluepal.security;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import jakarta.annotation.PostConstruct;
 import javax.crypto.Cipher;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -19,7 +20,18 @@ public class EncryptionService {
     private static final int IV_LENGTH_BYTE = 12;
     private static final int TAG_LENGTH_BIT = 128;
 
+    @PostConstruct
+    public void init() {
+        if (masterKey == null || masterKey.isBlank()) {
+            throw new IllegalStateException("encryption.master-key is not configured in application.properties!");
+        }
+    }
+
     public String encrypt(String plainText) throws Exception {
+        if (plainText == null) {
+            throw new IllegalArgumentException("Plain text to encrypt cannot be null");
+        }
+
         byte[] iv = new byte[IV_LENGTH_BYTE];
         new SecureRandom().nextBytes(iv);
 
@@ -37,6 +49,10 @@ public class EncryptionService {
     }
 
     public String decrypt(String encryptedText) throws Exception {
+        if (encryptedText == null) {
+            throw new IllegalArgumentException("Encrypted text to decrypt cannot be null");
+        }
+
         byte[] decoded = Base64.getDecoder().decode(encryptedText);
         ByteBuffer byteBuffer = ByteBuffer.wrap(decoded);
 

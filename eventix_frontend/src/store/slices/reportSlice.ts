@@ -1,28 +1,29 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import reportService from "../../service/reportService";
+import { OrganizationSummaryDTO, RevenueReportDTO } from "../../types/report.types";
 
 export const fetchOrgDashboard = createAsyncThunk(
-  'reports/fetchDashboard',
-  async (_orgId: string) => {
-    // In a real app this would call apiClient.get(`/reports/dashboard/${orgId}`)
-    return {
-      totalRevenue: 15420,
-      totalAttendees: 450,
-      activeEventsCount: 3,
-      totalEvents: 8
-    };
+  "reports/fetchDashboard",
+  async (orgId: number) => {
+    const summary = await reportService.getOrgSummary(orgId);
+    const revenue = await reportService.getRevenueByEvent(orgId);
+    return { summary, revenue };
   }
 );
 
+interface ReportState {
+  orgSummary: OrganizationSummaryDTO | null;
+  revenueByEvent: RevenueReportDTO[];
+  isLoading: boolean;
+}
+
 const reportSlice = createSlice({
-  name: 'reports',
+  name: "reports",
   initialState: {
-    orgSummary: null as any,
-    revenueByEvent: [
-      { eventId: '1', eventTitle: 'Summer Tech Conf', totalRevenue: 8500 },
-      { eventId: '2', eventTitle: 'Music Festival', totalRevenue: 6920 },
-    ],
+    orgSummary: null,
+    revenueByEvent: [],
     isLoading: false,
-  },
+  } as ReportState,
   reducers: {},
   extraReducers: (builder) => {
     builder
@@ -31,7 +32,8 @@ const reportSlice = createSlice({
       })
       .addCase(fetchOrgDashboard.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.orgSummary = action.payload;
+        state.orgSummary = action.payload.summary;
+        state.revenueByEvent = action.payload.revenue;
       })
       .addCase(fetchOrgDashboard.rejected, (state) => {
         state.isLoading = false;

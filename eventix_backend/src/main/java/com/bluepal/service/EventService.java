@@ -151,6 +151,8 @@ public class EventService {
     public Page<PublicEventDTO> getPublicEvents(int page, int size) {
         // T8: Default pagination (12 per page as per T8)
         Pageable pageable = PageRequest.of(page, size);
+
+
         return eventRepository.findPublicUpcomingEvents(pageable);
     }
 
@@ -203,13 +205,15 @@ public class EventService {
 
 
     // Update EventService.java
+    // Inside EventService.java
     public Page<PublicEventDTO> getPublicEvents(String search, LocalDateTime start, LocalDateTime end, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
-        // T3: Make dates optional; if start is null, the query uses CURRENT_TIMESTAMP from DB
-        return eventRepository.findPublicEventsFiltered(search, start, end, pageable);
-    }
+        // Sanitize the search term to avoid issues with empty strings
+        String searchTerm = (search != null && !search.trim().isEmpty()) ? search.trim() : null;
 
+        return eventRepository.findPublicEventsFiltered(searchTerm, start, end, pageable);
+    }
     /**
      * Centralized security check for event ownership.
      */
@@ -235,9 +239,8 @@ public class EventService {
                 .startDate(saved.getStartDate())
                 .endDate(saved.getEndDate())
                 .timezone(saved.getTimezone())
-                .visibility(saved.getVisibility())
                 .status(saved.getStatus())
-                .imagePath(saved.getImagePath())
+                .imageUrl(saved.getImageUrl())
                 .createdAt(saved.getCreatedAt())
                 .build();
     }
@@ -252,7 +255,7 @@ public class EventService {
                 .title(event.getTitle())
                 .startDate(event.getStartDate())
                 .location(event.getLocation())
-                .imagePath(event.getImagePath())
+                .imageUrl(event.getImageUrl())
                 .status(event.getStatus())
                 .ticketsSold(totalSold)
                 .build();

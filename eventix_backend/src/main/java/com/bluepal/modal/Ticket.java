@@ -21,7 +21,7 @@ public class Ticket {
     private TicketCategory ticketCategory;
 
     @Column(unique = true, nullable = false)
-    private UUID ticketCode = UUID.randomUUID();
+    private String ticketCode;
 
     private String attendeeName;
     private String attendeeEmail;

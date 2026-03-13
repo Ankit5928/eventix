@@ -16,7 +16,11 @@ const reportService = {
     const response = await axiosInstance.get<RevenueReportDTO[]>(
       "/reports/revenue-by-event",
       {
-        params: { organizationId: orgId, startDate: start, endDate: end },
+        params: { 
+          organizationId: orgId, 
+          startDate: start, 
+          endDate: end 
+        },
       },
     );
     return response.data;

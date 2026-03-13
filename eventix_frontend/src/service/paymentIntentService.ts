@@ -19,6 +19,11 @@ const paymentIntentService = {
     );
     return response.data;
   },
+
+  confirmPayment: async (data: { paymentIntentId: string; reservationId: string }): Promise<any> => {
+    const response = await axiosInstance.post("/payments/confirm-payment", data);
+    return response.data;
+  },
 };
 
 export default paymentIntentService;

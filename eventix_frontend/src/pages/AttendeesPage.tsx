@@ -1,36 +1,41 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import { 
-  Download, 
-  Filter, 
-  Eye, 
-  ChevronLeft, 
+import {
+  Download,
+  Filter,
+  Eye,
+  ChevronLeft,
   ChevronRight,
   Users,
   CheckCircle2,
   XCircle,
   Clock,
-  Mail
+  Mail,
+  Search,
+  Sparkles,
+  ShieldCheck,
+  Globe,
+  Loader2
 } from "lucide-react";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
 import { Card } from "../components/ui/Card";
 import { Modal } from "../components/ui/Modal";
-import { 
-  getAttendees, 
+import {
+  getAttendees,
   getAttendeeDetails,
-  downloadAttendeesCSV 
+  downloadAttendeesCSV
 } from "../service/attendeeService";
-import { 
-  AttendeeDTO, 
-  AttendeeDetailDTO, 
-  AttendeeFilters, 
-  PaginatedResponse 
+import {
+  AttendeeDTO,
+  AttendeeDetailDTO,
+  AttendeeFilters,
+  PaginatedResponse
 } from "../types/attendee.types";
 
 const AttendeesPage = () => {
   const { eventId } = useParams<{ eventId: string }>();
-  
+
   const [attendees, setAttendees] = useState<AttendeeDTO[]>([]);
   const [pagination, setPagination] = useState({
     page: 0,
@@ -38,20 +43,17 @@ const AttendeesPage = () => {
     totalPages: 0,
     totalElements: 0,
   });
-  
+
   const [filters, setFilters] = useState<Omit<AttendeeFilters, 'page' | 'size'>>({
     search: '',
     categoryId: '',
     checkedIn: '',
   });
 
-  // Debounced search term
   const [searchTerm, setSearchTerm] = useState('');
-  
   const [isLoading, setIsLoading] = useState(true);
   const [isExporting, setIsExporting] = useState(false);
-  
-  // Modal State
+
   const [selectedAttendee, setSelectedAttendee] = useState<AttendeeDetailDTO | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
@@ -72,7 +74,7 @@ const AttendeesPage = () => {
         totalElements: data.totalElements,
       }));
     } catch (error) {
-      console.error("Failed to fetch attendees:", error);
+      console.error("Sync Failure:", error);
     } finally {
       setIsLoading(false);
     }
@@ -82,20 +84,18 @@ const AttendeesPage = () => {
     fetchAttendeesData();
   }, [fetchAttendeesData]);
 
-  // Handle Search Debounce
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       setFilters(prev => ({ ...prev, search: searchTerm }));
-      setPagination(prev => ({ ...prev, page: 0 })); // Reset page on search
+      setPagination(prev => ({ ...prev, page: 0 }));
     }, 500);
-
     return () => clearTimeout(delayDebounceFn);
   }, [searchTerm]);
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFilters(prev => ({ ...prev, [name]: value }));
-    setPagination(prev => ({ ...prev, page: 0 })); // Reset to first page
+    setPagination(prev => ({ ...prev, page: 0 }));
   };
 
   const handlePageChange = (newPage: number) => {
@@ -110,7 +110,7 @@ const AttendeesPage = () => {
     try {
       await downloadAttendeesCSV(eventId, filters);
     } catch (error) {
-      console.error("Failed to export CSV:", error);
+      console.error("Export Error:", error);
     } finally {
       setIsExporting(false);
     }
@@ -123,7 +123,7 @@ const AttendeesPage = () => {
       const details = await getAttendeeDetails(ticketId);
       setSelectedAttendee(details);
     } catch (error) {
-      console.error("Failed to fetch attendee details:", error);
+      console.error("Detail Fetch Error:", error);
     } finally {
       setIsLoadingDetails(false);
     }
@@ -131,170 +131,174 @@ const AttendeesPage = () => {
 
   const closeDetailsModal = () => {
     setIsModalOpen(false);
-    // Give time for exit animation before clearing data
     setTimeout(() => setSelectedAttendee(null), 300);
   };
 
   const getStatusBadge = (status: string, checkedInAt: string | null) => {
     if (checkedInAt) {
       return (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20">
-          <CheckCircle2 className="w-3.5 h-3.5" />
-          Checked In
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-green-500/10 text-green-500 border border-green-500/20">
+          <CheckCircle2 className="w-3 h-3" />
+          Verified Entry
         </span>
       );
     }
-    
+
     if (status === 'VALID' || status === 'ACTIVE') {
       return (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
-          <Clock className="w-3.5 h-3.5" />
-          Pending Entry
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-blue-500/10 text-blue-400 border border-blue-500/20">
+          <Clock className="w-3 h-3" />
+          Pending Node
         </span>
       );
     }
 
     return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-destructive/10 text-destructive border border-destructive/20">
-        <XCircle className="w-3.5 h-3.5" />
+      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-red-500/10 text-red-500 border border-red-500/20">
+        <XCircle className="w-3 h-3" />
         {status}
       </span>
     );
   };
 
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-6">
-      {/* Header section */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold font-heading flex items-center gap-3">
-            <Users className="w-8 h-8 text-primary" />
-            Attendees Management
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            View, filter, and export ticket holders for this event.
-          </p>
+    <div className="space-y-10 animate-fade-in-up bg-[#0A0000] min-h-screen text-white p-4 md:p-8">
+
+      {/* Header Section */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 border-b border-white/5 pb-10">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 text-[#FF3333]">
+            <Sparkles className="h-4 w-4" />
+            <span className="text-[10px] font-black uppercase tracking-[0.4em]">Registry Terminal</span>
+          </div>
+          <h1 className="text-4xl font-bold tracking-tighter italic">Liaison <span className="text-[#FF3333]">Manifest</span></h1>
+          <p className="text-white/40 text-xs tracking-widest uppercase font-medium">Global Attendee Intelligence & Node Verification</p>
         </div>
-        <Button 
-          onClick={handleExportCSV} 
+
+        <Button
+          variant="premium"
+          onClick={handleExportCSV}
           disabled={isExporting}
-          className="flex items-center gap-2 relative overflow-hidden group"
+          className="h-12 px-8 rounded-2xl shadow-2xl shadow-[#FF3333]/20 border-0"
         >
-          {isExporting ? (
-            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-          ) : (
-            <Download className="w-4 h-4" />
-          )}
-          <span className="relative z-10">{isExporting ? 'Exporting...' : 'Export CSV'}</span>
-          <div className="absolute inset-0 h-full w-full scale-[0] rounded-lg transition-all duration-300 group-hover:scale-[100%] group-hover:bg-white/10 z-0"></div>
+          {isExporting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
+          {isExporting ? "Decrypting Data..." : "Export Manifest CSV"}
         </Button>
       </div>
 
-      {/* Filters Card */}
-      <Card className="p-4 bg-card/50 backdrop-blur-sm border border-border shadow-sm">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Input
-            placeholder="Search by name or email..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            // icon={<Search className="w-4 h-4 text-muted-foreground" />} // Assuming Input doesn't support icon based on earlier task
-          />
-          
-          <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-muted-foreground shrink-0" />
+      {/* Control Terminal (Filters) */}
+      <div className="bg-white/[0.02] backdrop-blur-3xl border border-white/5 rounded-[2rem] p-6 shadow-2xl">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+          <div className="md:col-span-6 relative group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20 group-focus-within:text-[#FF3333] transition-colors" />
+            <Input
+              placeholder="SEARCH BY IDENTITY OR ENCRYPTION..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-12 h-12 bg-white/[0.03] border-white/10 rounded-xl focus:border-[#FF3333]/50 text-white placeholder:text-white/10 text-[10px] font-black tracking-widest"
+            />
+          </div>
+
+          <div className="md:col-span-3">
             <select
               name="checkedIn"
               value={filters.checkedIn}
               onChange={handleFilterChange}
-              className="flex-1 h-10 px-3 py-2 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+              className="w-full h-12 rounded-xl border border-white/10 bg-white/[0.03] px-4 text-[10px] font-black tracking-widest text-white focus:ring-1 focus:ring-[#FF3333]/50 appearance-none transition-all cursor-pointer"
             >
-              <option value="">All Statuses</option>
-              <option value="checked_in">Checked In</option>
-              <option value="not_checked_in">Not Checked In</option>
+              <option value="" className="bg-[#0A0000]">ALL PROTOCOLS</option>
+              <option value="checked_in" className="bg-[#0A0000]">VERIFIED ENTRY</option>
+              <option value="not_checked_in" className="bg-[#0A0000]">PENDING ACCESS</option>
             </select>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-muted-foreground shrink-0" />
+          <div className="md:col-span-3">
             <select
               name="categoryId"
               value={filters.categoryId}
               onChange={handleFilterChange}
-              className="flex-1 h-10 px-3 py-2 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+              className="w-full h-12 rounded-xl border border-white/10 bg-white/[0.03] px-4 text-[10px] font-black tracking-widest text-white focus:ring-1 focus:ring-[#FF3333]/50 appearance-none transition-all cursor-pointer"
             >
-              <option value="">All Categories</option>
-              {/* Note: In a full app, you'd fetch the actual categories for this event to populate this */}
-              <option value="fake-uuid-ga">General Admission</option>
-              <option value="fake-uuid-vip">VIP Pass</option>
+              <option value="" className="bg-[#0A0000]">ALL TIERS</option>
+              <option value="fake-uuid-ga" className="bg-[#0A0000]">GENERAL CLEARANCE</option>
+              <option value="fake-uuid-vip" className="bg-[#0A0000]">PREMIUM VIP</option>
             </select>
           </div>
         </div>
-      </Card>
+      </div>
 
-      {/* Data Table Card */}
-      <Card className="overflow-hidden border border-border shadow-sm">
+      {/* Main Data Terminal */}
+      <div className="bg-white/[0.02] backdrop-blur-3xl border border-white/5 rounded-[2.5rem] shadow-2xl overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm whitespace-nowrap">
-            <thead className="bg-muted/50 text-muted-foreground border-b border-border">
-              <tr>
-                <th className="px-6 py-4 font-medium">Attendee</th>
-                <th className="px-6 py-4 font-medium">Ticket Type</th>
-                <th className="px-6 py-4 font-medium">Order ID</th>
-                <th className="px-6 py-4 font-medium">Status</th>
-                <th className="px-6 py-4 font-medium text-right">Actions</th>
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 border-b border-white/5">
+                <th className="px-8 py-6">Subject Identity</th>
+                <th className="px-8 py-6">Clearance Tier</th>
+                <th className="px-8 py-6">Manifest ID</th>
+                <th className="px-8 py-6">Status</th>
+                <th className="px-8 py-6 text-right">Terminal</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border">
+            <tbody className="divide-y divide-white/[0.03]">
               {isLoading ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">
-                    <div className="flex flex-col items-center justify-center space-y-3">
-                      <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
-                      <p>Loading attendees...</p>
+                  <td colSpan={5} className="px-8 py-32 text-center">
+                    <div className="flex flex-col items-center gap-4">
+                      <Loader2 className="h-10 w-10 animate-spin text-[#FF3333]" />
+                      <p className="text-[10px] font-black uppercase tracking-[0.5em] text-white/20">Decrypting Manifest...</p>
                     </div>
                   </td>
                 </tr>
               ) : attendees.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">
-                    <div className="flex flex-col items-center justify-center space-y-3">
-                      <Users className="w-12 h-12 text-muted" />
-                      <p className="text-lg font-medium text-foreground">No attendees found</p>
-                      <p>Try adjusting your search or filters.</p>
+                  <td colSpan={5} className="px-8 py-32 text-center text-white/20">
+                    <div className="flex flex-col items-center gap-4 opacity-20">
+                      <Users className="h-16 w-16" />
+                      <p className="text-[10px] font-black uppercase tracking-[0.5em]">No Liaisons Detected</p>
                     </div>
                   </td>
                 </tr>
               ) : (
                 attendees.map((attendee) => (
-                  <tr 
-                    key={attendee.id} 
-                    className="hover:bg-muted/30 transition-colors group"
-                  >
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col">
-                        <span className="font-medium text-foreground">{attendee.attendeeName}</span>
-                        <span className="text-xs text-muted-foreground">{attendee.attendeeEmail}</span>
+                  <tr key={attendee.id} className="hover:bg-white/[0.02] transition-all group">
+                    <td className="px-8 py-6">
+                      <div className="flex items-center gap-4">
+                        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-white/10 to-transparent flex items-center justify-center text-[#FF3333] font-black border border-white/5 group-hover:scale-110 transition-transform">
+                          {attendee.attendeeName[0]}
+                        </div>
+                        <div className="space-y-0.5">
+                          <span className="text-xs font-black uppercase tracking-widest text-white group-hover:text-[#FF3333] transition-colors">
+                            {attendee.attendeeName}
+                          </span>
+                          <span className="block text-[9px] text-white/30 tracking-tight font-bold italic">
+                            {attendee.attendeeEmail}
+                          </span>
+                        </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <span className="inline-flex items-center px-2 py-1 rounded-md bg-secondary text-secondary-foreground text-xs font-medium">
+                    <td className="px-8 py-6">
+                      <span className="text-[10px] font-bold text-white/60 tracking-[0.1em]">
                         {attendee.ticketCategoryName}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-muted-foreground font-mono text-xs">
-                      #{attendee.orderId}
+                    <td className="px-8 py-6">
+                      <span className="font-mono text-[10px] text-white/30 bg-white/5 px-2 py-1 rounded">
+                        #{attendee.orderId}
+                      </span>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-8 py-6">
                       {getStatusBadge(attendee.status, attendee.checkedInAt)}
                     </td>
-                    <td className="px-6 py-4 text-right">
-                      <button 
+                    <td className="px-8 py-6 text-right">
+                      <Button
+                        variant="ghost"
+                        size="icon"
                         onClick={() => openAttendeeDetails(attendee.id)}
-                        className="p-2 rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors inline-flex items-center justify-center"
-                        title="View Details"
+                        className="h-10 w-10 rounded-xl bg-white/[0.03] hover:bg-[#FF3333]/10 text-white/40 hover:text-[#FF3333]"
                       >
                         <Eye className="w-4 h-4" />
-                      </button>
+                      </Button>
                     </td>
                   </tr>
                 ))
@@ -303,62 +307,65 @@ const AttendeesPage = () => {
           </table>
         </div>
 
-        {/* Pagination */}
+        {/* Tactical Pagination */}
         {!isLoading && attendees.length > 0 && (
-          <div className="px-6 py-4 border-t border-border flex items-center justify-between bg-muted/20">
-            <span className="text-sm text-muted-foreground">
-              Showing <span className="font-medium text-foreground">{pagination.page * pagination.size + 1}</span> to <span className="font-medium text-foreground">{Math.min((pagination.page + 1) * pagination.size, pagination.totalElements)}</span> of <span className="font-medium text-foreground">{pagination.totalElements}</span> attendees
+          <div className="px-8 py-6 border-t border-white/5 flex items-center justify-between bg-white/[0.01]">
+            <span className="text-[9px] font-black uppercase tracking-widest text-white/20">
+              Showing <span className="text-white">{pagination.page * pagination.size + 1}</span> — <span className="text-white">{Math.min((pagination.page + 1) * pagination.size, pagination.totalElements)}</span> of <span className="text-[#FF3333]">{pagination.totalElements}</span> Node Subjects
             </span>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4">
               <Button
-                variant="outline"
-                size="sm"
+                variant="ghost"
                 onClick={() => handlePageChange(pagination.page - 1)}
                 disabled={pagination.page === 0}
-                className="w-10 h-10 p-0"
+                className="h-10 w-10 rounded-xl bg-white/[0.03] hover:bg-white/5 border border-white/5"
               >
                 <ChevronLeft className="w-4 h-4" />
               </Button>
-              <div className="text-sm font-medium px-2">
-                Page {pagination.page + 1} of {pagination.totalPages}
+              <div className="text-[10px] font-black uppercase tracking-[0.2em]">
+                Page {pagination.page + 1} <span className="text-white/20">/</span> {pagination.totalPages}
               </div>
               <Button
-                variant="outline"
-                size="sm"
+                variant="ghost"
                 onClick={() => handlePageChange(pagination.page + 1)}
                 disabled={pagination.page >= pagination.totalPages - 1}
-                className="w-10 h-10 p-0"
+                className="h-10 w-10 rounded-xl bg-white/[0.03] hover:bg-white/5 border border-white/5"
               >
                 <ChevronRight className="w-4 h-4" />
               </Button>
             </div>
           </div>
         )}
-      </Card>
+      </div>
 
-      {/* Attendee Details Modal */}
-      <Modal 
-        isOpen={isModalOpen} 
+      {/* Attendee Details Modal - Using Portal based Luxury Modal */}
+      <Modal
+        isOpen={isModalOpen}
         onClose={closeDetailsModal}
-        title="Ticket Details"
+        title="Subject Intelligence"
+        description="Detailed liaison manifest data and entry logs."
       >
         {isLoadingDetails ? (
-           <div className="py-12 flex flex-col items-center justify-center space-y-4">
-             <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
-             <p className="text-muted-foreground">Loading details...</p>
-           </div>
+          <div className="py-20 flex flex-col items-center justify-center gap-4">
+            <Loader2 className="w-8 h-8 text-[#FF3333] animate-spin" />
+            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40">Synchronizing Hub...</p>
+          </div>
         ) : selectedAttendee ? (
-          <div className="space-y-6">
-            
+          <div className="space-y-8 p-2">
+
             {/* Top Identity Block */}
-            <div className="flex items-start justify-between border-b pb-6">
-              <div>
-                <h3 className="text-xl font-bold font-heading">{selectedAttendee.attendeeName}</h3>
-                <div className="mt-1 space-y-1 text-sm text-muted-foreground flex flex-col">
-                  <span className="flex items-center gap-2"><Mail className="w-3.5 h-3.5"/> {selectedAttendee.attendeeEmail}</span>
-                  {selectedAttendee.phoneNumber && (
-                    <span className="flex items-center gap-2">📞 {selectedAttendee.phoneNumber}</span>
-                  )}
+            <div className="flex items-center justify-between border-b border-white/5 pb-8">
+              <div className="flex items-center gap-5">
+                <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-[#FF3333] to-transparent p-px">
+                  <div className="w-full h-full bg-[#0A0000] rounded-2xl flex items-center justify-center">
+                    <Users className="w-8 h-8 text-[#FF3333]" />
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-2xl font-black italic tracking-tighter uppercase">{selectedAttendee.attendeeName}</h3>
+                  <div className="flex items-center gap-3 text-[10px] font-bold text-white/40 uppercase tracking-widest italic">
+                    <Mail className="w-3 h-3 text-[#FF3333]" /> {selectedAttendee.attendeeEmail}
+                  </div>
                 </div>
               </div>
               <div>
@@ -366,56 +373,55 @@ const AttendeesPage = () => {
               </div>
             </div>
 
-            {/* Structured Details */}
-            <div className="grid grid-cols-2 gap-y-6 gap-x-4">
-              <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-1">Ticket Category</p>
-                <p className="font-medium text-foreground">{selectedAttendee.ticketCategoryName}</p>
-              </div>
-              
-              <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-1">Ticket Price</p>
-                <p className="font-medium text-foreground">${selectedAttendee.ticketPrice.toFixed(2)}</p>
+            {/* Intelligence Grid */}
+            <div className="grid grid-cols-2 gap-8">
+              <div className="space-y-1.5 px-4 py-3 bg-white/[0.02] border border-white/5 rounded-2xl">
+                <p className="text-[8px] font-black text-white/20 uppercase tracking-[0.3em]">Clearance Tier</p>
+                <p className="text-xs font-black text-white uppercase tracking-widest">{selectedAttendee.ticketCategoryName}</p>
               </div>
 
-              <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-1">Ticket ID</p>
-                <p className="font-mono text-xs p-1.5 bg-muted rounded border">{selectedAttendee.id}</p>
+              <div className="space-y-1.5 px-4 py-3 bg-white/[0.02] border border-white/5 rounded-2xl">
+                <p className="text-[8px] font-black text-white/20 uppercase tracking-[0.3em]">Asset Valuation</p>
+                <p className="text-xs font-black text-[#FF3333] uppercase tracking-widest">${selectedAttendee.ticketPrice.toFixed(2)}</p>
               </div>
 
-              <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-1">Transaction ID</p>
-                <p className="font-mono text-xs p-1.5 bg-muted rounded border">{selectedAttendee.transactionId}</p>
+              <div className="space-y-1.5 px-4 py-3 bg-white/[0.02] border border-white/5 rounded-2xl">
+                <p className="text-[8px] font-black text-white/20 uppercase tracking-[0.3em]">Manifest Token</p>
+                <p className="font-mono text-[9px] text-white/60 truncate">{selectedAttendee.id}</p>
               </div>
 
-              <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-1">Purchase Date</p>
-                <p className="text-sm font-medium">
+              <div className="space-y-1.5 px-4 py-3 bg-white/[0.02] border border-white/5 rounded-2xl">
+                <p className="text-[8px] font-black text-white/20 uppercase tracking-[0.3em]">Transaction ID</p>
+                <p className="font-mono text-[9px] text-white/60 truncate">{selectedAttendee.transactionId}</p>
+              </div>
+
+              <div className="space-y-1.5 px-4 py-3 bg-white/[0.02] border border-white/5 rounded-2xl">
+                <p className="text-[8px] font-black text-white/20 uppercase tracking-[0.3em]">Commencement Log</p>
+                <p className="text-[10px] font-bold text-white/60">
                   {new Date(selectedAttendee.purchaseDate).toLocaleString()}
                 </p>
               </div>
 
-              <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-1">Check-In Time</p>
-                <p className="text-sm font-medium">
+              <div className="space-y-1.5 px-4 py-3 bg-white/[0.02] border border-white/5 rounded-2xl">
+                <p className="text-[8px] font-black text-white/20 uppercase tracking-[0.3em]">Node Arrival Time</p>
+                <p className="text-[10px] font-bold text-white/60">
                   {selectedAttendee.checkedInAt ? new Date(selectedAttendee.checkedInAt).toLocaleString() : '--'}
                 </p>
               </div>
             </div>
 
-            {/* Actions */}
-            <div className="pt-4 border-t flex justify-end">
-              <Button onClick={closeDetailsModal}>
-                Close
+            <div className="pt-4 flex justify-end">
+              <Button
+                variant="ghost"
+                onClick={closeDetailsModal}
+                className="text-[10px] font-black uppercase tracking-widest text-white/20 hover:text-white"
+              >
+                Terminate View
               </Button>
             </div>
-            
+
           </div>
-        ) : (
-          <div className="py-8 text-center text-muted-foreground">
-            Information unavailable.
-          </div>
-        )}
+        ) : null}
       </Modal>
 
     </div>

@@ -9,6 +9,7 @@ import com.stripe.Stripe;
 import com.stripe.model.PaymentIntent;
 import com.stripe.param.PaymentIntentCreateParams;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,12 @@ public class PaymentService {
     private final EncryptionService encryptionService;
     private final ReservationRepository reservationRepository;
 
+    @Value("${stripe.api.key}")
+    private String defaultStripeSecretKey;
+
+    @Value("${stripe.publishable.key}")
+    private String defaultStripePublishableKey;
+
     @Transactional
     public PaymentIntentResponse createPaymentIntent(UUID reservationId) throws Exception {
         // 1. Validate Reservation (EM-RESERVE-006-T4)
@@ -30,13 +37,29 @@ public class PaymentService {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new RuntimeException("Reservation not found"));
 
-        // 2. Get Organization Stripe Keys
+        // 2. Get Organization Stripe Keys (with Global Fallback)
         Organization org = reservation.getEvent().getOrganization();
         String encryptedSecretKey = org.getStripeSecretKey();
-        String secretKey = encryptionService.decrypt(encryptedSecretKey);
+        String publishableKey = org.getStripePublishableKey();
+        
+        String finalSecretKey;
+        String finalPublishableKey;
 
-        // 3. Initialize Stripe with Org's Private Key
-        Stripe.apiKey = secretKey;
+        if (encryptedSecretKey != null && publishableKey != null) {
+            // Use Organization's keys
+            finalSecretKey = encryptionService.decrypt(encryptedSecretKey);
+            finalPublishableKey = publishableKey;
+        } else if (defaultStripeSecretKey != null && defaultStripePublishableKey != null && 
+                   !defaultStripeSecretKey.isBlank() && !defaultStripePublishableKey.isBlank()) {
+            // Fallback to Global Platform Keys
+            finalSecretKey = defaultStripeSecretKey;
+            finalPublishableKey = defaultStripePublishableKey;
+        } else {
+            throw new RuntimeException("Stripe configuration missing for this organization and no platform default found.");
+        }
+
+        // 3. Initialize Stripe with selected Private Key
+        Stripe.apiKey = finalSecretKey;
 
         // 4. Calculate Amount in Cents (Stripe uses smallest currency unit)
         long amountInCents = (long) (reservationService.getReservationSummary(reservationId).getTotalAmount() * 100);
@@ -50,6 +73,6 @@ public class PaymentService {
 
         PaymentIntent intent = PaymentIntent.create(params);
 
-        return new PaymentIntentResponse(intent.getClientSecret(), org.getStripePublishableKey());
+        return new PaymentIntentResponse(intent.getClientSecret(), finalPublishableKey);
     }
 }

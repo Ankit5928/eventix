@@ -25,7 +25,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     Page<Event> findByOrganizationId(Long organizationId, Pageable pageable);
 
     @Query("SELECT e FROM Event e WHERE e.organization.id = :orgId " +
-            "AND LOWER(e.title) LIKE LOWER(CONCAT('%', :search, '%'))")
+            "AND (:search IS NULL OR LOWER(CAST(e.title AS string)) LIKE LOWER(CONCAT('%', :search, '%')))")
     Page<Event> searchByTitle(@Param("orgId") Long orgId,
                               @Param("search") String search,
                               Pageable pageable);
@@ -35,61 +35,60 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     Long countByOrganizationId(Long orgId);
 
     // T6: Active events (Published and not yet started/finished)
-    @Query("SELECT COUNT(e) FROM Event e WHERE e.organization.id = :orgId AND e.status = 'PUBLISHED' AND e.startDate > CURRENT_TIMESTAMP")
+    @Query("SELECT COUNT(e) FROM Event e WHERE e.organization.id = :orgId AND e.status = 'ACTIVE' AND e.startDate > CURRENT_TIMESTAMP")
     Long countActiveEvents(@Param("orgId") Long orgId);
 
     // T8: Next 5 upcoming events
     @Query("SELECT e FROM Event e WHERE e.organization.id = :orgId AND e.startDate > CURRENT_TIMESTAMP ORDER BY e.startDate ASC")
     List<Event> findTop5UpcomingEvents(@Param("orgId") Long orgId, Pageable pageable);
 
-
     // Add to EventRepository.java
     @Query("SELECT new com.bluepal.dto.response.PublicEventDTO(" +
-            "e.id, e.title, e.description, e.startDate, e.location, e.imagePath, MIN(tc.price)) " + // 1. Fix here
+            "e.id, e.title, e.description, e.startDate, e.location, e.imagePath, MIN(tc.price)) " +
             "FROM Event e " +
             "JOIN e.ticketCategories tc " +
             "WHERE e.visibility = 'PUBLIC' " +
-            "AND e.status = 'PUBLISHED' " +
+            "AND e.status = 'ACTIVE' " +
             "AND e.startDate >= CURRENT_TIMESTAMP " +
-            "GROUP BY e.id, e.title, e.description, e.startDate, e.location, e.imagePath " + // 2. Fix here
+            "GROUP BY e.id, e.title, e.description, e.startDate, e.location, e.imagePath " +
             "ORDER BY e.startDate ASC")
     Page<PublicEventDTO> findPublicUpcomingEvents(Pageable pageable);
 
     // Update EventRepository.java
     @Query("SELECT new com.bluepal.dto.response.PublicEventDTO(" +
-            "e.id, e.title, e.description, e.startDate, e.location, e.imagePath, MIN(tc.price)) " + // Changed imageUrl -> imagePath
+            "e.id, e.title, e.description, e.startDate, e.location, e.imagePath, MIN(tc.price)) " +
             "FROM Event e " +
             "JOIN e.ticketCategories tc " +
             "WHERE e.visibility = 'PUBLIC' " +
-            "AND e.status = 'PUBLISHED' " +
+            "AND e.status = 'ACTIVE' " +
             "AND e.startDate >= CURRENT_TIMESTAMP " +
             "AND (:search IS NULL OR " +
             "     (LOWER(e.title) LIKE LOWER(CONCAT('%', :search, '%')) " +
             "      OR LOWER(e.location) LIKE LOWER(CONCAT('%', :search, '%')))) " +
-            "GROUP BY e.id, e.title, e.description, e.startDate, e.location, e.imagePath " + // Changed imageUrl -> imagePath
+            "GROUP BY e.id, e.title, e.description, e.startDate, e.location, e.imagePath " +
             "ORDER BY e.startDate ASC")
     Page<PublicEventDTO> findPublicUpcomingEventsWithSearch(
             @Param("search") String search,
-            Pageable pageable
-    );
-
+            Pageable pageable);
 
     @Query("SELECT new com.bluepal.dto.response.PublicEventDTO(" +
             "e.id, e.title, e.description, e.startDate, e.location, e.imagePath, MIN(tc.price)) " +
             "FROM Event e " +
             "JOIN e.ticketCategories tc " +
             "WHERE e.visibility = 'PUBLIC' " +
-            "AND e.status = 'PUBLISHED' " +
+            "AND e.status = 'ACTIVE' " +
             "AND e.startDate >= CURRENT_TIMESTAMP " +
-            "AND (:start IS NULL OR e.startDate >= :start) " +
-            "AND (:end IS NULL OR e.startDate <= :end) " +
-            "AND (:search IS NULL OR (LOWER(e.title) LIKE LOWER(CONCAT('%', :search, '%')))) " +
+            // CAST the parameters to their respective types so Postgres knows how to handle NULL checks
+            "AND (CAST(:startDate AS localdatetime) IS NULL OR e.startDate >= :startDate) " +
+            "AND (CAST(:endDate AS localdatetime) IS NULL OR e.startDate <= :endDate) " +
+            "AND (CAST(:search AS string) IS NULL OR (LOWER(CAST(e.title AS string)) LIKE LOWER(CONCAT('%', CAST(:search AS string), '%')))) " +
             "GROUP BY e.id, e.title, e.description, e.startDate, e.location, e.imagePath " +
             "ORDER BY e.startDate ASC")
     Page<PublicEventDTO> findPublicEventsFiltered(
             @Param("search") String search,
-            @Param("start") java.time.LocalDateTime start,
-            @Param("end") java.time.LocalDateTime end,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate,
             Pageable pageable
     );
+
 }

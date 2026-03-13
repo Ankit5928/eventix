@@ -13,8 +13,11 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class OrderItem {
+
     @Id
-    private UUID id = UUID.randomUUID();
+    @GeneratedValue
+    @Column(columnDefinition = "UUID", updatable = false, nullable = false)
+    private UUID id;
 
     @ManyToOne
     @JoinColumn(name = "order_id")

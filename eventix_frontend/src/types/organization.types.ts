@@ -17,5 +17,5 @@ export interface OrganizationResponse {
 
 export interface AddUserRequest {
   email: string;
-  role: 'ORGANIZER' | 'CHECK_IN_OPERATOR';
+  role: 'ORGANIZER' | 'CHECK_IN_OPERATOR' | 'OWNER';
 }

@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js';
 import Button from '../commons/Button';
 import Alert from '../commons/Alert';
+import paymentIntentService from '../../service/paymentIntentService';
 
 interface PaymentFormProps {
+  reservationId: string;
   onSuccess: (orderId: string) => void;
 }
 
-const PaymentForm: React.FC<PaymentFormProps> = ({ onSuccess }) => {
+const PaymentForm: React.FC<PaymentFormProps> = ({ reservationId, onSuccess }) => {
   const stripe = useStripe();
   const elements = useElements();
   
@@ -36,8 +38,19 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ onSuccess }) => {
       setErrorMessage(error.message || "An unexpected error occurred.");
       setIsProcessing(false);
     } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-      // Payment success! Now handle the transition
-      onSuccess(paymentIntent.id);
+      try {
+        // Payment successful with Stripe, now confirm with our backend to fulfill order
+        const order = await paymentIntentService.confirmPayment({
+          paymentIntentId: paymentIntent.id,
+          reservationId
+        });
+        
+        // Pass the actual database order ID to the success handler
+        onSuccess(order.orderId);
+      } catch (err: any) {
+        setErrorMessage(err.response?.data?.message || "Payment succeeded but order fulfillment failed. Please contact support.");
+        setIsProcessing(false);
+      }
     }
   };
 

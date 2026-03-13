@@ -10,6 +10,6 @@ public class AttendeeDTO {
     private String name;
     private String email;
     private String ticketCategory;
-    private UUID ticketCode;
+    private String ticketCode;
     private boolean checkedIn;
 }

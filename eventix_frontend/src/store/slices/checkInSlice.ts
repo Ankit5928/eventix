@@ -1,6 +1,9 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import checkInService from '../../service/checkInService';
-import { CheckInStatsDTO, TicketValidationResponse } from '../../types/checkin.types';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import checkInService from "../../service/checkInService";
+import {
+  CheckInStatsDTO,
+  TicketValidationResponse,
+} from "../../types/checkin.types";
 
 interface CheckInState {
   stats: CheckInStatsDTO | null;
@@ -17,27 +20,27 @@ const initialState: CheckInState = {
 };
 
 export const fetchEventStats = createAsyncThunk(
-  'checkin/fetchStats',
+  "checkin/fetchStats",
   async (eventId: number) => {
     return await checkInService.getEventStats(eventId);
-  }
+  },
 );
 
 export const validateScannedCode = createAsyncThunk(
-  'checkin/validate',
+  "checkin/validate",
   async (code: string) => {
     return await checkInService.validateTicket(code);
-  }
+  },
 );
 
 const checkInSlice = createSlice({
-  name: 'checkin',
+  name: "checkin",
   initialState,
   reducers: {
     resetScanner: (state) => {
       state.scannedTicket = null;
       state.error = null;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -47,7 +50,7 @@ const checkInSlice = createSlice({
       .addCase(validateScannedCode.fulfilled, (state, action) => {
         state.scannedTicket = action.payload;
       })
-      .addCase(validateScannedCode.rejected, (state, action) => {
+      .addCase(validateScannedCode.rejected, (state) => {
         state.error = "Invalid QR Code or Network Error";
       });
   },
