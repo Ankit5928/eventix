@@ -1,8 +1,24 @@
 import React, { useState } from "react";
 import { Button } from "../components/ui/Button";
+import { Input } from "../components/ui/Input";
+import { Modal } from "../components/ui/Modal";
 import { CreateEventRequest, EventResponse } from "../types/event.types";
 import eventService from "../service/eventService";
 import { useAppSelector } from "../store";
+import {
+  Type,
+  MapPin,
+  Clock,
+  Calendar,
+  Globe,
+  Eye,
+  Image as ImageIcon,
+  AlignLeft,
+  Loader2,
+  Plus,
+  Sparkles,
+  AlertCircle
+} from "lucide-react";
 
 interface AddEventModalProps {
   open: boolean;
@@ -20,24 +36,17 @@ const initialState: CreateEventRequest = {
   visibility: "PUBLIC",
 };
 
-const AddEventModal: React.FC<AddEventModalProps> = ({
-  open,
-  onClose,
-  onCreate,
-}) => {
+const AddEventModal: React.FC<AddEventModalProps> = ({ open, onClose, onCreate }) => {
   const [form, setForm] = useState<CreateEventRequest>(initialState);
   const [error, setError] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const { user } = useAppSelector((state) => state.auth);
   const orgId = user?.currentOrganizationId || 1;
 
-  if (!open) return null;
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
@@ -52,132 +61,206 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.title || !form.startDate || !form.endDate || !form.location) {
-      setError("Please fill all required fields.");
+      setError("Incomplete manifest. Primary data nodes required.");
       return;
     }
     if (new Date(form.startDate) >= new Date(form.endDate)) {
-      setError("Start date must be before end date.");
+      setError("Timeline violation: Commencement must precede conclusion.");
       return;
     }
+
     setError(null);
-    const createdEvent = await onCreate(form);
+    setIsSubmitting(true);
 
-    // Upload image if selected
-    if (imageFile && createdEvent && createdEvent.id) {
-      setUploading(true);
-      try {
+    try {
+      const createdEvent = await onCreate(form);
+
+      if (imageFile && createdEvent?.id) {
         await eventService.uploadImage(orgId, createdEvent.id, imageFile);
-      } catch {
-        // Image upload failed but event was created
       }
-      setUploading(false);
-    }
 
-    setForm(initialState);
-    setImageFile(null);
-    setImagePreview(null);
+      setForm(initialState);
+      setImageFile(null);
+      setImagePreview(null);
+      onClose();
+    } catch (err) {
+      setError("Synchronization failed. Check uplink.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-      <div className="bg-white dark:bg-card rounded-lg shadow-lg w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
-        <h2 className="text-2xl font-bold mb-4">Create New Event</h2>
-        {error && <div className="mb-3 text-red-600 text-sm">{error}</div>}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Image Upload */}
-          <div>
-            <label className="text-sm font-medium text-foreground mb-1 block">
-              Event Banner
-            </label>
-            {imagePreview && (
-              <img
-                src={imagePreview}
-                alt="Preview"
-                className="w-full h-32 object-cover rounded-md mb-2"
+    <Modal
+      isOpen={open}
+      onClose={onClose}
+      title="Initialize Manifest"
+      description="Deploy a new event asset to the global registry."
+      className="max-w-2xl"
+    >
+      <form onSubmit={handleSubmit} className="space-y-6 pb-2">
+        {error && (
+          <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+            <AlertCircle className="h-4 w-4" /> {error}
+          </div>
+        )}
+
+        {/* Image Dropzone Asset */}
+        <div className="space-y-2">
+          <label className="text-[8px] font-black text-white/30 uppercase tracking-[0.4em] pl-1 flex items-center gap-2">
+            <ImageIcon className="w-3 h-3 text-[#FF3333]" /> Visual Identity (Banner)
+          </label>
+          <div className="relative group cursor-pointer">
+            <div className={`w-full h-32 rounded-2xl border-2 border-dashed transition-all duration-500 flex flex-col items-center justify-center overflow-hidden bg-white/[0.02] ${imagePreview ? 'border-[#FF3333]/50' : 'border-white/10 hover:border-[#FF3333]/30'}`}>
+              {imagePreview ? (
+                <img src={imagePreview} alt="Preview" className="w-full h-full object-cover brightness-50 group-hover:brightness-75 transition-all" />
+              ) : (
+                <div className="flex flex-col items-center gap-2 opacity-20 group-hover:opacity-40 transition-opacity">
+                  <Plus className="w-6 h-6 text-white" />
+                  <span className="text-[10px] font-black uppercase tracking-widest">Upload Asset</span>
+                </div>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="absolute inset-0 opacity-0 cursor-pointer"
               />
-            )}
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              className="w-full border rounded p-2 text-sm"
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {/* Identity */}
+          <div className="md:col-span-2 space-y-1.5">
+            <label className="text-[8px] font-black text-white/30 uppercase tracking-[0.4em] pl-1 flex items-center gap-2">
+              <Type className="w-3 h-3 text-[#FF3333]" /> Asset Designation
+            </label>
+            <Input
+              name="title"
+              value={form.title}
+              onChange={handleChange}
+              placeholder="EVENT TITLE"
+              className="h-11 bg-white/[0.03] border-white/10 text-white text-xs font-bold tracking-widest"
+              required
             />
           </div>
-          <input
-            name="title"
-            value={form.title}
-            onChange={handleChange}
-            placeholder="Title *"
-            className="w-full border rounded p-2"
-            required
-          />
-          <textarea
-            name="description"
-            value={form.description}
-            onChange={handleChange}
-            placeholder="Description"
-            className="w-full border rounded p-2"
-            rows={3}
-          />
-          <input
-            name="location"
-            value={form.location}
-            onChange={handleChange}
-            placeholder="Location *"
-            className="w-full border rounded p-2"
-            required
-          />
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-xs text-muted-foreground">Start *</label>
-              <input
-                name="startDate"
-                type="datetime-local"
-                value={form.startDate}
-                onChange={handleChange}
-                className="w-full border rounded p-2"
-                required
-              />
-            </div>
-            <div>
-              <label className="text-xs text-muted-foreground">End *</label>
-              <input
-                name="endDate"
-                type="datetime-local"
-                value={form.endDate}
-                onChange={handleChange}
-                className="w-full border rounded p-2"
-                required
-              />
-            </div>
+
+          {/* Location & Timezone */}
+          <div className="space-y-1.5">
+            <label className="text-[8px] font-black text-white/30 uppercase tracking-[0.4em] pl-1 flex items-center gap-2">
+              <MapPin className="w-3 h-3 text-[#FF3333]" /> Deployment Coordinate
+            </label>
+            <Input
+              name="location"
+              value={form.location}
+              onChange={handleChange}
+              placeholder="VENUE / CITY"
+              className="h-11 bg-white/[0.03] border-white/10 text-white text-xs font-bold"
+              required
+            />
           </div>
-          <input
-            name="timezone"
-            value={form.timezone}
-            onChange={handleChange}
-            placeholder="Timezone (e.g. UTC)"
-            className="w-full border rounded p-2"
-          />
-          <select
-            name="visibility"
-            value={form.visibility}
-            onChange={handleChange}
-            className="w-full border rounded p-2"
+
+          <div className="space-y-1.5">
+            <label className="text-[8px] font-black text-white/30 uppercase tracking-[0.4em] pl-1 flex items-center gap-2">
+              <Globe className="w-3 h-3 text-[#FF3333]" /> Temporal Zone
+            </label>
+            <Input
+              name="timezone"
+              value={form.timezone}
+              onChange={handleChange}
+              placeholder="e.g. UTC"
+              className="h-11 bg-white/[0.03] border-white/10 text-white text-xs font-bold"
+            />
+          </div>
+
+          {/* Timeline */}
+          <div className="space-y-1.5">
+            <label className="text-[8px] font-black text-white/30 uppercase tracking-[0.4em] pl-1 flex items-center gap-2">
+              <Clock className="w-3 h-3 text-[#FF3333]" /> Commencement
+            </label>
+            <Input
+              name="startDate"
+              type="datetime-local"
+              value={form.startDate}
+              onChange={handleChange}
+              className="h-11 bg-white/[0.03] border-white/10 text-white text-[10px]"
+              required
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-[8px] font-black text-white/30 uppercase tracking-[0.4em] pl-1 flex items-center gap-2">
+              <Calendar className="w-3 h-3 text-[#FF3333]" /> Conclusion
+            </label>
+            <Input
+              name="endDate"
+              type="datetime-local"
+              value={form.endDate}
+              onChange={handleChange}
+              className="h-11 bg-white/[0.03] border-white/10 text-white text-[10px]"
+              required
+            />
+          </div>
+
+          {/* Protocol Selection */}
+          <div className="md:col-span-2 space-y-1.5">
+            <label className="text-[8px] font-black text-white/30 uppercase tracking-[0.4em] pl-1 flex items-center gap-2">
+              <Eye className="w-3 h-3 text-[#FF3333]" /> Visibility Protocol
+            </label>
+            <select
+              name="visibility"
+              value={form.visibility}
+              onChange={handleChange}
+              className="w-full h-11 bg-white/[0.03] border border-white/10 rounded-xl px-4 text-[10px] font-black tracking-[0.2em] text-white focus:ring-1 focus:ring-[#FF3333]/50 appearance-none cursor-pointer outline-none"
+            >
+              <option value="PUBLIC" className="bg-[#0A0000]">PUBLIC (OPEN NODE)</option>
+              <option value="PRIVATE" className="bg-[#0A0000]">PRIVATE (ENCRYPTED)</option>
+            </select>
+          </div>
+
+          {/* Descriptive Narrative */}
+          <div className="md:col-span-2 space-y-1.5">
+            <label className="text-[8px] font-black text-white/30 uppercase tracking-[0.4em] pl-1 flex items-center gap-2">
+              <AlignLeft className="w-3 h-3 text-[#FF3333]" /> Mission Narrative
+            </label>
+            <textarea
+              name="description"
+              value={form.description}
+              onChange={handleChange}
+              placeholder="DETAILED DESCRIPTION..."
+              className="w-full h-24 bg-white/[0.03] border border-white/10 rounded-xl p-4 text-white text-xs leading-relaxed font-light italic focus:outline-none focus:ring-1 focus:ring-[#FF3333]/50 transition-all placeholder:text-white/10"
+            />
+          </div>
+        </div>
+
+        {/* Footer Actions */}
+        <div className="flex justify-end items-center gap-6 pt-6 border-t border-white/5 mt-4">
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20 hover:text-white transition-colors"
           >
-            <option value="PUBLIC">Public</option>
-            <option value="PRIVATE">Private</option>
-          </select>
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="submit" variant="default" disabled={uploading}>
-              {uploading ? "Uploading..." : "Create"}
-            </Button>
-          </div>
-        </form>
-      </div>
-    </div>
+            Abort
+          </button>
+          <Button
+            type="submit"
+            variant="premium"
+            disabled={isSubmitting}
+            className="h-11 px-10 rounded-xl font-black text-[10px] uppercase tracking-[0.3em] shadow-xl shadow-[#FF3333]/10 border-0"
+          >
+            {isSubmitting ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <>
+                <Sparkles className="w-4 h-4 mr-2" />
+                Initialize Asset
+              </>
+            )}
+          </Button>
+        </div>
+      </form>
+    </Modal>
   );
 };
 

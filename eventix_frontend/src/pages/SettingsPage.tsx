@@ -20,6 +20,10 @@ import {
   CreditCard,
   Building2,
   Loader2,
+  Crown,
+  Key,
+  Globe,
+  Settings as SettingsIcon,
 } from "lucide-react";
 import { AddUserRequest } from "../types/organization.types";
 
@@ -78,16 +82,11 @@ const SettingsPage = () => {
     setSuccess(null);
     try {
       await organizationService.addUser(orgId, formData);
-      setSuccess(
-        `Successfully added ${formData.email} as ${formData.role.replace("_", " ")}.`
-      );
+      setSuccess(`Liaison authorized: ${formData.email}`);
       setFormData({ email: "", role: "ORGANIZER" });
     } catch (err: any) {
-      const errMsg =
-        err.response?.data?.message ||
-        err.response?.data ||
-        "Failed to invite team member.";
-      setError(typeof errMsg === "string" ? errMsg : "An unexpected error occurred.");
+      const errMsg = err.response?.data?.message || "Protocol violation. Invite failed.";
+      setError(typeof errMsg === "string" ? errMsg : "System error.");
     } finally {
       setIsLoading(false);
     }
@@ -101,160 +100,136 @@ const SettingsPage = () => {
     setStripeSuccess(null);
     try {
       await paymentService.updateStripeConfig(orgId, stripeForm);
-      setStripeSuccess("Stripe keys saved successfully.");
+      setStripeSuccess("Financial gateway synchronized.");
       setStripeForm({ stripePublishableKey: "", stripeSecretKey: "" });
     } catch (err: any) {
-      setStripeError(
-        err.response?.data?.message || "Failed to save Stripe configuration."
-      );
+      setStripeError("Validation failed. Check encryption keys.");
     } finally {
       setStripeLoading(false);
     }
   };
 
   return (
-    <div className="space-y-8 animate-fade-in-up p-4 md:p-8 max-w-4xl mx-auto">
-      <div>
-        <h1 className="text-3xl font-bold font-heading">Settings</h1>
-        <p className="text-muted-foreground mt-1">
-          Manage your organization, team, and payment configuration.
-        </p>
+    <div className="space-y-12 animate-fade-in-up p-4 md:p-10 max-w-5xl mx-auto bg-[#0A0000] text-white min-h-screen">
+
+      {/* Header Section */}
+      <div className="border-b border-white/5 pb-8">
+        <div className="flex items-center gap-2 text-[#FF3333] mb-2">
+          <SettingsIcon className="w-4 h-4" />
+          <span className="text-[10px] font-black uppercase tracking-[0.4em]">Control Terminal</span>
+        </div>
+        <h1 className="text-4xl font-bold tracking-tighter italic">System <span className="text-[#FF3333]">Configurations</span></h1>
+        <p className="text-white/40 text-xs mt-2 uppercase tracking-widest font-medium">Manage hierarchy, liaisons, and global clearing</p>
       </div>
 
-      <div className="grid gap-8">
+      <div className="grid gap-10">
+
         {/* ── Organization Profile ── */}
-        <Card className="border-primary/10 shadow-sm backdrop-blur-sm bg-card/90">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Building2 className="w-5 h-5 text-primary" />
-              Organization Profile
+        <Card variant="premium" className="bg-white/[0.02] border-white/5 rounded-[2rem] overflow-hidden backdrop-blur-3xl shadow-2xl">
+          <CardHeader className="bg-white/[0.01] border-b border-white/5 p-8">
+            <CardTitle className="flex items-center gap-3 text-xl italic font-bold tracking-tight">
+              <Building2 className="w-5 h-5 text-[#FF3333]" />
+              Organization Identity
             </CardTitle>
-            <CardDescription>
-              Your organization details and membership info.
-            </CardDescription>
+            <CardDescription className="text-white/30 text-[10px] font-bold uppercase tracking-widest mt-1">Registry Details & Authorized Personnel</CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="text-muted-foreground">Name</span>
-                <p className="font-medium text-foreground">{orgName || "—"}</p>
+          <CardContent className="p-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+              <div className="space-y-1">
+                <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">Entity Designation</span>
+                <p className="text-xl font-bold text-white tracking-tight">{orgName || "—"}</p>
               </div>
-              <div>
-                <span className="text-muted-foreground">Created</span>
-                <p className="font-medium text-foreground">
-                  {orgCreatedAt
-                    ? new Date(orgCreatedAt).toLocaleDateString(undefined, {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })
-                    : "—"}
+              <div className="space-y-1 text-right">
+                <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">Commencement Date</span>
+                <p className="text-sm font-bold text-white/60">
+                  {orgCreatedAt ? new Date(orgCreatedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : "—"}
                 </p>
               </div>
-              <div className="md:col-span-2">
-                <span className="text-muted-foreground">Team Members</span>
-                <div className="mt-2 space-y-2">
-                  {orgUsers.length === 0 && (
-                    <p className="text-muted-foreground text-xs">No members loaded.</p>
-                  )}
-                  {orgUsers.map((u: any) => (
-                    <div
-                      key={u.id}
-                      className="flex items-center justify-between py-1.5 px-3 bg-muted/30 rounded-md text-sm"
-                    >
-                      <span>
-                        {u.firstName} {u.lastName}{" "}
-                        <span className="text-muted-foreground">({u.email})</span>
-                      </span>
-                      <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary">
-                        {u.role}
-                      </span>
+            </div>
+
+            <div className="space-y-4">
+              <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em] flex items-center gap-2">
+                <Users className="w-3 h-3 text-[#FF3333]" /> Active Liaisons
+              </span>
+              <div className="grid gap-3">
+                {orgUsers.map((u: any) => (
+                  <div key={u.id} className="flex items-center justify-between p-4 bg-white/[0.03] border border-white/5 rounded-2xl hover:bg-white/[0.05] transition-all group">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#FF3333]/20 to-transparent flex items-center justify-center text-[#FF3333] font-bold border border-[#FF3333]/10">
+                        {u.firstName?.[0] || 'U'}
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-white">{u.firstName} {u.lastName}</p>
+                        <p className="text-[10px] text-white/30 tracking-tight">{u.email}</p>
+                      </div>
                     </div>
-                  ))}
-                </div>
+                    <span className="text-[9px] font-black px-3 py-1 rounded-full bg-[#FF3333]/10 text-[#FF3333] uppercase tracking-widest border border-[#FF3333]/20">
+                      {u.role}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           </CardContent>
         </Card>
 
         {/* ── Team Management ── */}
-        <Card className="border-primary/10 shadow-sm backdrop-blur-sm bg-card/90">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="w-5 h-5 text-primary" />
-              Team Management
+        <Card variant="premium" className="bg-white/[0.02] border-white/5 rounded-[2rem] overflow-hidden backdrop-blur-3xl shadow-2xl">
+          <CardHeader className="bg-white/[0.01] border-b border-white/5 p-8">
+            <CardTitle className="flex items-center gap-3 text-xl italic font-bold tracking-tight text-white">
+              <Users className="w-5 h-5 text-[#FF3333]" />
+              Liaison Recruitment
             </CardTitle>
-            <CardDescription>
-              Invite new members to collaborate on your events.
-            </CardDescription>
+            <CardDescription className="text-white/30 text-[10px] font-bold uppercase tracking-widest mt-1">Authorize new members to control local nodes</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-8">
             {!isOwner ? (
-              <div className="p-4 rounded-lg bg-yellow-500/10 text-yellow-600 border border-yellow-500/20 text-sm">
-                Only Organization Owners can invite team members.
+              <div className="p-4 rounded-xl bg-yellow-500/5 text-yellow-500 border border-yellow-500/20 text-[10px] font-bold uppercase tracking-widest flex items-center gap-3">
+                <AlertCircle className="w-4 h-4" /> Restricted: Owner Authorization Required
               </div>
             ) : (
-              <form onSubmit={handleInvite} className="space-y-4">
-                {error && (
-                  <div className="p-3 rounded-lg bg-destructive/10 text-destructive text-sm flex items-start gap-2 border border-destructive/20">
-                    <AlertCircle className="w-5 h-5 shrink-0" />
-                    <span>{error}</span>
+              <form onSubmit={handleInvite} className="space-y-6">
+                {(error || success) && (
+                  <div className={`p-4 rounded-xl text-[10px] font-bold uppercase tracking-widest flex items-center gap-3 border ${error ? 'bg-red-500/5 text-red-500 border-red-500/20' : 'bg-green-500/5 text-green-500 border-green-500/20'}`}>
+                    {error ? <AlertCircle className="w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />}
+                    {error || success}
                   </div>
                 )}
-                {success && (
-                  <div className="p-3 rounded-lg bg-green-500/10 text-green-600 text-sm flex items-start gap-2 border border-green-500/20">
-                    <CheckCircle2 className="w-5 h-5 shrink-0" />
-                    <span>{success}</span>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-1.5">
+                    <label className="text-[8px] font-black text-white/30 uppercase tracking-[0.4em] pl-1">Communication Channel (Email)</label>
+                    <Input
+                      name="email"
+                      type="email"
+                      placeholder="identity@consortium.int"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                      className="h-12 bg-white/[0.03] border-white/10 rounded-xl focus:border-[#FF3333]/50 text-white placeholder:text-white/10 text-xs font-bold tracking-widest"
+                      disabled={isLoading}
+                    />
                   </div>
-                )}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Input
-                    label="Email Address"
-                    name="email"
-                    type="email"
-                    placeholder="colleague@example.com"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    disabled={isLoading}
-                  />
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">
-                      Assign Role
-                    </label>
+                  <div className="space-y-1.5">
+                    <label className="text-[8px] font-black text-white/30 uppercase tracking-[0.4em] pl-1">Assigned Protocol Role</label>
                     <div className="relative">
-                      <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                        <Shield className="h-4 w-4 text-muted-foreground" />
-                      </div>
                       <select
                         name="role"
                         value={formData.role}
                         onChange={handleChange}
                         disabled={isLoading}
-                        className="flex h-10 w-full rounded-md border border-input bg-background/50 pl-10 pr-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50 transition-colors"
+                        className="flex h-12 w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs font-bold tracking-widest text-white focus:outline-none focus:ring-1 focus:ring-[#FF3333]/50 appearance-none transition-all cursor-pointer"
                       >
-                        {/* Add the ORGANIZER option here */}
-                        <option value="ORGANIZER">Organizer (Full Event Access)</option>
-
-                        <option value="CHECK_IN_OPERATOR">
-                          Check-in Operator (Door/Scanning Only)
-                        </option>
-
-                        {/* If your backend supports it, you can also add other roles here */}
+                        <option value="ORGANIZER" className="bg-[#0A0000]">ORGANIZER (FULL CLEARANCE)</option>
+                        <option value="CHECK_IN_OPERATOR" className="bg-[#0A0000]">CHECK_IN_OPERATOR (FIELD ACCESS)</option>
                       </select>
+                      <Shield className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 pointer-events-none" />
                     </div>
                   </div>
                 </div>
-                <div className="pt-2 flex justify-end">
-                  <Button type="submit" disabled={isLoading} className="w-full md:w-auto">
-                    {isLoading ? (
-                      <div className="flex items-center gap-2">
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        Inviting...
-                      </div>
-                    ) : (
-                      "Send Invitation"
-                    )}
+                <div className="flex justify-end pt-2">
+                  <Button variant="premium" type="submit" disabled={isLoading} className="h-11 px-8 rounded-xl text-[10px] font-black uppercase tracking-[0.3em] shadow-lg shadow-[#FF3333]/10">
+                    {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Dispatch Authorization"}
                   </Button>
                 </div>
               </form>
@@ -264,75 +239,59 @@ const SettingsPage = () => {
 
         {/* ── Stripe Configuration ── */}
         {isOwner && (
-          <Card className="border-primary/10 shadow-sm backdrop-blur-sm bg-card/90">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CreditCard className="w-5 h-5 text-primary" />
-                Stripe Payment Configuration
+          <Card variant="premium" className="bg-white/[0.02] border-white/5 rounded-[2rem] overflow-hidden backdrop-blur-3xl shadow-2xl">
+            <CardHeader className="bg-white/[0.01] border-b border-white/5 p-8">
+              <CardTitle className="flex items-center gap-3 text-xl italic font-bold tracking-tight text-white">
+                <CreditCard className="w-5 h-5 text-[#FF3333]" />
+                Clearing Configuration
               </CardTitle>
-              <CardDescription>
-                Add your Stripe API keys to accept payments.{" "}
-                <a
-                  href="https://dashboard.stripe.com/apikeys"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-primary underline"
-                >
-                  Get your keys
-                </a>
+              <CardDescription className="text-white/30 text-[10px] font-bold uppercase tracking-widest mt-1">
+                Establish secure financial clearing via Stripe.{" "}
+                <a href="https://dashboard.stripe.com/apikeys" target="_blank" rel="noreferrer" className="text-[#FF3333] hover:text-white transition-colors underline underline-offset-4">Get Terminal Keys</a>
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <form onSubmit={handleStripeSubmit} className="space-y-4">
-                {stripeError && (
-                  <div className="p-3 rounded-lg bg-destructive/10 text-destructive text-sm flex items-start gap-2 border border-destructive/20">
-                    <AlertCircle className="w-5 h-5 shrink-0" />
-                    <span>{stripeError}</span>
+            <CardContent className="p-8">
+              <form onSubmit={handleStripeSubmit} className="space-y-6">
+                {(stripeError || stripeSuccess) && (
+                  <div className={`p-4 rounded-xl text-[10px] font-bold uppercase tracking-widest flex items-center gap-3 border ${stripeError ? 'bg-red-500/5 text-red-500 border-red-500/20' : 'bg-green-500/5 text-green-500 border-green-500/20'}`}>
+                    {stripeError ? <AlertCircle className="w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />}
+                    {stripeError || stripeSuccess}
                   </div>
                 )}
-                {stripeSuccess && (
-                  <div className="p-3 rounded-lg bg-green-500/10 text-green-600 text-sm flex items-start gap-2 border border-green-500/20">
-                    <CheckCircle2 className="w-5 h-5 shrink-0" />
-                    <span>{stripeSuccess}</span>
+                <div className="grid gap-6">
+                  <div className="space-y-1.5">
+                    <label className="text-[8px] font-black text-white/30 uppercase tracking-[0.4em] pl-1 flex items-center gap-2">
+                      <Globe className="w-3 h-3" /> Public Clearance Key
+                    </label>
+                    <Input
+                      name="stripePublishableKey"
+                      placeholder="pk_test_••••••••"
+                      value={stripeForm.stripePublishableKey}
+                      onChange={(e) => setStripeForm({ ...stripeForm, stripePublishableKey: e.target.value })}
+                      required
+                      disabled={stripeLoading}
+                      className="h-12 bg-white/[0.03] border-white/10 rounded-xl focus:border-[#FF3333]/50 text-white placeholder:text-white/10 text-xs font-bold tracking-widest"
+                    />
                   </div>
-                )}
-                <Input
-                  label="Publishable Key"
-                  name="stripePublishableKey"
-                  placeholder="pk_test_..."
-                  value={stripeForm.stripePublishableKey}
-                  onChange={(e) =>
-                    setStripeForm({ ...stripeForm, stripePublishableKey: e.target.value })
-                  }
-                  required
-                  disabled={stripeLoading}
-                />
-                <Input
-                  label="Secret Key"
-                  name="stripeSecretKey"
-                  type="password"
-                  placeholder="sk_test_..."
-                  value={stripeForm.stripeSecretKey}
-                  onChange={(e) =>
-                    setStripeForm({ ...stripeForm, stripeSecretKey: e.target.value })
-                  }
-                  required
-                  disabled={stripeLoading}
-                />
-                <div className="pt-2 flex justify-end">
-                  <Button
-                    type="submit"
-                    disabled={stripeLoading}
-                    className="w-full md:w-auto"
-                  >
-                    {stripeLoading ? (
-                      <div className="flex items-center gap-2">
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        Saving...
-                      </div>
-                    ) : (
-                      "Save Stripe Keys"
-                    )}
+                  <div className="space-y-1.5">
+                    <label className="text-[8px] font-black text-white/30 uppercase tracking-[0.4em] pl-1 flex items-center gap-2">
+                      <Key className="w-3 h-3" /> Secret Encryption Key
+                    </label>
+                    <Input
+                      name="stripeSecretKey"
+                      type="password"
+                      placeholder="sk_test_••••••••"
+                      value={stripeForm.stripeSecretKey}
+                      onChange={(e) => setStripeForm({ ...stripeForm, stripeSecretKey: e.target.value })}
+                      required
+                      disabled={stripeLoading}
+                      className="h-12 bg-white/[0.03] border-white/10 rounded-xl focus:border-[#FF3333]/50 text-white placeholder:text-white/10 text-xs font-bold tracking-widest"
+                    />
+                  </div>
+                </div>
+                <div className="flex justify-end pt-2">
+                  <Button variant="premium" type="submit" disabled={stripeLoading} className="h-11 px-8 rounded-xl text-[10px] font-black uppercase tracking-[0.3em] shadow-lg shadow-[#FF3333]/10">
+                    {stripeLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save Security Configuration"}
                   </Button>
                 </div>
               </form>

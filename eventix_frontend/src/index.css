@@ -5,6 +5,7 @@
 @import '@fontsource/outfit/500.css';
 @import '@fontsource/outfit/600.css';
 @import '@fontsource/outfit/700.css';
+@import url('https://fonts.cdnfonts.com/css/olivia-southmore');
 
 @tailwind base;
 @tailwind components;
@@ -12,65 +13,28 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 243 75% 59%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 142 71% 45%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 243 75% 59%;
-
-    --radius: 0.75rem;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222 47% 11%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 243 75% 65%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 142 71% 45%;
-    --accent-foreground: 210 40% 98%;
-
+    /* Synchronized to your International Red/Obsidian theme */
+    --background: 0 0% 4%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 4%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 4%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 100% 60%;
+    /* #FF3333 */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 9%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 0 100% 60%;
+    --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 243 75% 65%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 12%;
+    --input: 0 0% 12%;
+    --ring: 0 100% 60%;
+    --radius: 1.25rem;
   }
 }
 
@@ -78,18 +42,103 @@
   * {
     @apply border-border;
   }
+
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    /* Force Obsidian background globally */
+    @apply bg-[#0A0000] text-foreground font-sans antialiased;
+    overflow-x: hidden;
   }
-  h1, h2, h3, h4, h5, h6 {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-heading tracking-tight;
   }
 }
 
-.glass-panel {
-  @apply bg-white/10 backdrop-blur-lg border border-white/20 dark:bg-black/20 dark:border-white/10 shadow-xl;
+@layer components {
+
+  /* The "Master" Wrapper - Updated to deep obsidian */
+  .premium-page-container {
+    @apply min-h-screen w-full relative overflow-hidden bg-[#0A0000] text-white;
+    font-family: 'Inter', sans-serif;
+    /* Content is Inter, Headings are Olivia */
+  }
+
+  /* Fixed Background Overlays for Cinematic Depth */
+  .premium-bg-overlay {
+    @apply absolute inset-0 z-0 pointer-events-none;
+    background: radial-gradient(circle at 50% 50%, #1A0000 0%, #0A0000 100%);
+  }
+
+  /* High-Fashion Title Style */
+  .premium-title {
+    @apply text-5xl lg:text-8xl font-bold tracking-tighter text-center italic;
+    font-family: 'Olivia Southmore', serif;
+  }
+
+  /* Animated Red Gradient Text */
+  .premium-gradient-text {
+    @apply bg-gradient-to-r from-[#FF3333] via-[#FF6666] to-[#FF3333] bg-clip-text text-transparent animate-gradient;
+    background-size: 200% auto;
+  }
+
+  /* Luxury Buttons */
+  .premium-button {
+    @apply bg-gradient-to-r from-[#FF3333] to-[#990000] hover:brightness-125 text-white font-black uppercase tracking-[0.2em] rounded-xl transition-all duration-500 shadow-xl shadow-[#FF3333]/10 transform hover:-translate-y-0.5 active:scale-95;
+  }
+
+  /* Glassmorphism Cards */
+  .premium-card {
+    @apply bg-white/[0.02] backdrop-blur-3xl border border-white/5 rounded-[2rem] hover:border-[#FF3333]/30 transition-all duration-700 shadow-2xl;
+  }
+
+  /* High-End Scrollbar for Modals and Dashboard */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-[#FF3333]/20 rounded-full hover:bg-[#FF3333]/40 transition-colors;
+  }
 }
 
-.text-gradient {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-500;
+/* Animations */
+@keyframes gradient {
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-gradient {
+  animation: gradient 4s ease infinite;
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.8s ease-out forwards;
 }
