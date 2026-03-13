@@ -29,7 +29,7 @@ public class OrderReportController {
      * T12-T16: Returns revenue analytics with optional date range filtering.
      */
     @GetMapping("/revenue-by-event")
-    @PreAuthorize("hasRole('ORGANIZER')")
+    @PreAuthorize("hasRole('ORGANIZER') or hasRole('OWNER')")
     public ResponseEntity<List<RevenueReportDTO>> getRevenueReport(
             @RequestParam Long organizationId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
@@ -40,7 +40,7 @@ public class OrderReportController {
 
     // Add to OrderReportController.java
     @GetMapping("/sales-over-time")
-    @PreAuthorize("hasRole('ORGANIZER')")
+    @PreAuthorize("hasRole('ORGANIZER') or hasRole('OWNER')")
     public ResponseEntity<List<SalesTimeSeriesDTO>> getSalesTrend(
             @RequestParam Long eventId,
             @RequestParam(defaultValue = "DAY") String groupBy,
@@ -55,7 +55,7 @@ public class OrderReportController {
      * T5-T7: Returns a ranked list of events based on ticket sales volume.
      */
     @GetMapping("/top-selling-events")
-    @PreAuthorize("hasRole('ORGANIZER')")
+    @PreAuthorize("hasRole('ORGANIZER') or hasRole('OWNER')")
     public ResponseEntity<List<RevenueReportDTO>> getTopSelling(
             @RequestParam Long organizationId,
             @RequestParam(defaultValue = "5") int limit) {
@@ -67,7 +67,7 @@ public class OrderReportController {
      * T9-T10: Returns the high-level dashboard summary for a specific event.
      */
     @GetMapping("/events/{eventId}/summary")
-    @PreAuthorize("hasRole('ORGANIZER')")
+    @PreAuthorize("hasRole('ORGANIZER') or hasRole('OWNER')")
     public ResponseEntity<EventSummaryDTO> getEventDashboardSummary(@PathVariable Long eventId) {
         // Note: Security check to ensure organizer owns the event is recommended here
         return ResponseEntity.ok(reportingService.getEventSummary(eventId));
@@ -82,7 +82,7 @@ public class OrderReportController {
 
     // Add to OrderReportController.java
     @GetMapping("/sales-pdf")
-    @PreAuthorize("hasRole('ORGANIZER')")
+    @PreAuthorize("hasRole('ORGANIZER') or hasRole('OWNER')")
     public ResponseEntity<byte[]> downloadSalesReport(
             @RequestParam Long organizationId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,

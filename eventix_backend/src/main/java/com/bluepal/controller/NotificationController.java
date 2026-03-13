@@ -19,7 +19,7 @@ public class NotificationController {
      * T9-T11: Opens a real-time SSE stream for sale notifications.
      */
     @GetMapping(value = "/sales-stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    @PreAuthorize("hasRole('ORGANIZER')")
+    @PreAuthorize("hasRole('ORGANIZER') or hasRole('OWNER')")
     public SseEmitter streamSales(@RequestParam Long organizationId) {
         // Use the current logged-in user's ID to manage the connection
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
