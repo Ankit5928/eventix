@@ -6,7 +6,7 @@ export interface PaymentIntentResponse {
   clientSecret: string;
   amount: number;
   currency: string;
-  publishableKey: string; // The backend often sends this to initialize Stripe
+  stripePublishableKey: string;
 }
 
 export interface PaymentIntentState {

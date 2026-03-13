@@ -1,9 +1,8 @@
 export interface TicketValidationResponse {
-  isValid: boolean;
+  status: "VALID" | "INVALID" | "ALREADY_CHECKED_IN";
   ticketCode: string;
   attendeeName: string;
-  ticketCategory: string;
-  status: "UNUSED" | "USED" | "INVALID" | "CANCELLED";
+  categoryName: string;
   message?: string;
 }
 
@@ -31,6 +30,6 @@ export interface TicketSearchResultDTO {
   ticketCode: string;
   attendeeName: string;
   attendeeEmail: string;
-  ticketCategory: string;
+  categoryName: string;
   isCheckedIn: boolean;
 }

@@ -2,7 +2,8 @@ export interface AttendeeDetailRequest {
   firstName: string;
   lastName: string;
   email: string;
-  phoneNumber?: string;
+  phone: string;
+  termsAccepted: boolean;
 }
 
 export interface ReservationSummaryDTO {

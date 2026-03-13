@@ -13,7 +13,8 @@ import java.util.UUID;
 @Builder
 public class Reservation {
     @Id
-    private UUID id = UUID.randomUUID();
+    @GeneratedValue
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")

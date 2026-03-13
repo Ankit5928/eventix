@@ -30,12 +30,22 @@ public class ReportingService {
      * T4: Fetches revenue metrics for all events under an organization.
      */
     public List<RevenueReportDTO> getRevenueByEvent(Long orgId, LocalDateTime start, LocalDateTime end) {
-        List<RevenueReportDTO> reports = orderRepository.getRevenueReportByOrganization(orgId, start, end);
+        LocalDateTime actualStart = (start != null) ? start : LocalDateTime.of(2000, 1, 1, 0, 0);
+        LocalDateTime actualEnd = (end != null) ? end : LocalDateTime.of(2100, 1, 1, 0, 0);
+        
+        List<RevenueReportDTO> reports = orderRepository.getRevenueReportByOrganization(orgId, actualStart, actualEnd);
 
-        // T9: Additional calculation safety
         reports.forEach(report -> {
-            if (report.getTicketsSold() > 0) {
-                report.setAvgTicketPrice(report.getTotalRevenue() / report.getTicketsSold());
+            double total = report.getTotalRevenue() != null ? report.getTotalRevenue() : 0.0;
+            long sold = report.getTicketsSold() != null ? report.getTicketsSold() : 0L;
+            
+            report.setTotalRevenue(total);
+            report.setTicketsSold(sold);
+            
+            if (sold > 0) {
+                report.setAvgTicketPrice(total / sold);
+            } else {
+                report.setAvgTicketPrice(0.0);
             }
         });
 

@@ -21,15 +21,16 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
     // Add to OrderRepository.java
 // 1. Fix the Revenue Report Query
     @Query("SELECT new com.bluepal.dto.response.RevenueReportDTO(" +
-            "e.id, e.title, SUM(o.totalAmount), COUNT(i.id), AVG(o.totalAmount)) " +
+            "e.id, e.title, COALESCE(SUM(o.totalAmount), 0.0), COALESCE(COUNT(i.id), 0L), " +
+            "COALESCE(SUM(o.totalAmount) / NULLIF(COUNT(i.id), 0), 0.0)) " +
             "FROM Order o " +
             "JOIN o.reservation r " +
             "JOIN r.event e " +
-            "JOIN o.items i " + // Changed o.tickets -> o.items
+            "LEFT JOIN o.items i " + // Use LEFT JOIN to catch events even if items list is tricky
             "WHERE e.organization.id = :orgId " +
             "AND o.status = 'CONFIRMED' " +
-            "AND (:startDate IS NULL OR o.createdAt >= :startDate) " +
-            "AND (:endDate IS NULL OR o.createdAt <= :endDate) " +
+            "AND o.createdAt >= :startDate " +
+            "AND o.createdAt <= :endDate " +
             "GROUP BY e.id, e.title " +
             "ORDER BY SUM(o.totalAmount) DESC")
     List<RevenueReportDTO> getRevenueReportByOrganization(
@@ -60,11 +61,12 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
 
     // 2. Fix the Top Selling Events Query (The one from your latest log)
     @Query("SELECT new com.bluepal.dto.response.RevenueReportDTO(" +
-            "e.id, e.title, SUM(o.totalAmount), COUNT(i.id), AVG(o.totalAmount)) " +
+            "e.id, e.title, COALESCE(SUM(o.totalAmount), 0.0), COALESCE(COUNT(i.id), 0L), " +
+            "COALESCE(SUM(o.totalAmount) / NULLIF(COUNT(i.id), 0), 0.0)) " +
             "FROM Order o " +
             "JOIN o.reservation r " +
             "JOIN r.event e " +
-            "JOIN o.items i " + // Changed o.tickets -> o.items
+            "LEFT JOIN o.items i " +
             "WHERE e.organization.id = :orgId " +
             "AND o.status = 'CONFIRMED' " +
             "GROUP BY e.id, e.title " +

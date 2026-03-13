@@ -12,7 +12,7 @@ export const initiatePayment = createAsyncThunk(
   "paymentIntent/create",
   async (reservationId: string, { rejectWithValue }) => {
     try {
-      return await paymentIntentService.createIntent(reservationId);
+      return await paymentIntentService.createIntent({ reservationId });
     } catch (err: any) {
       return rejectWithValue(
         err.response?.data || "Failed to initiate payment",

@@ -6,9 +6,11 @@ import com.bluepal.dto.response.EventListItemDTO;
 import com.bluepal.dto.response.EventResponse;
 import com.bluepal.service.EventService;
 import com.bluepal.service.FileStorageService;
+import com.bluepal.service.CloudinaryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,8 +27,7 @@ public class EventController {
 
     private final EventService eventService;
     private final FileStorageService fileStorageService;
-
-
+    private final CloudinaryService cloudinaryService;
 
     @GetMapping
     public ResponseEntity<Page<EventResponse>> getPublicEvents(Pageable pageable) {
@@ -48,8 +49,7 @@ public class EventController {
     @PreAuthorize("hasRole('ORGANIZER') or hasRole('OWNER')")
     public ResponseEntity<EventResponse> createEvent(
             @PathVariable Long organizationId,
-            @Valid @RequestBody CreateEventRequest request
-    ) {
+            @Valid @RequestBody CreateEventRequest request) {
         return new ResponseEntity<>(eventService.createEvent(organizationId, request), HttpStatus.CREATED);
     }
 
@@ -61,22 +61,29 @@ public class EventController {
     public ResponseEntity<EventResponse> uploadImage(
             @PathVariable Long organizationId,
             @PathVariable Long eventId,
-            @RequestParam("file") MultipartFile file
-    ) throws IOException {
-        String path = fileStorageService.saveEventImage(eventId, file);
-        return ResponseEntity.ok(eventService.updateEventImage(organizationId, eventId, path));
+            @RequestParam("file") MultipartFile file) throws IOException {
+        // Upload to Cloudinary
+        var uploadResult = cloudinaryService.upload(file);
+        String imageUrl = uploadResult.get("secure_url").toString();
+        return ResponseEntity.ok(eventService.updateEventImage(organizationId, eventId, imageUrl));
     }
 
     /**
      * EM-EVENT-003 & 004: List and Search.
      */
-    @GetMapping("/{organizationId}")
+    // Inside EventController.java
+
+    @GetMapping("/organization/{organizationId}")
     @PreAuthorize("hasRole('ORGANIZER') or hasRole('OWNER')")
     public ResponseEntity<Page<EventListItemDTO>> getEvents(
             @PathVariable Long organizationId,
             @RequestParam(required = false) String search,
-            Pageable pageable
-    ) {
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        // Create the Pageable object manually inside the controller
+        Pageable pageable = PageRequest.of(page, size);
+
         return ResponseEntity.ok(eventService.getEventsByOrganization(organizationId, search, pageable));
     }
 
@@ -88,8 +95,7 @@ public class EventController {
     public ResponseEntity<EventResponse> updateEvent(
             @PathVariable Long organizationId,
             @PathVariable Long eventId,
-            @Valid @RequestBody UpdateEventRequest request
-    ) {
+            @Valid @RequestBody UpdateEventRequest request) {
         return ResponseEntity.ok(eventService.updateEvent(organizationId, eventId, request));
     }
 
@@ -101,8 +107,7 @@ public class EventController {
     public ResponseEntity<Void> cancelEvent(
             @PathVariable Long organizationId,
             @PathVariable Long eventId,
-            @RequestParam(defaultValue = "false") boolean force
-    ) {
+            @RequestParam(defaultValue = "false") boolean force) {
         eventService.cancelEvent(organizationId, eventId, force);
         return ResponseEntity.noContent().build();
     }

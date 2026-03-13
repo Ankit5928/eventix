@@ -28,18 +28,7 @@ public class CheckInService {
      * T2-T9: Main validation logic for ticket entry.
      */
     @Transactional(readOnly = true)
-    public TicketValidationResponse validateTicket(String ticketCodeStr) {
-        UUID ticketCode;
-        try {
-            // T3-T4: Parse and handle malformed UUIDs
-            ticketCode = UUID.fromString(ticketCodeStr);
-        } catch (IllegalArgumentException e) {
-            return TicketValidationResponse.builder()
-                    .status("INVALID")
-                    .message("The scanned code format is incorrect.")
-                    .build();
-        }
-
+    public TicketValidationResponse validateTicket(String ticketCode) {
         // T5: Query the ticket by its unique public code
         return ticketRepository.findByTicketCode(ticketCode)
                 .map(this::processTicketStatus)
@@ -74,9 +63,9 @@ public class CheckInService {
      * This updates the database state.
      */
     @Transactional
-    public CheckInResponse checkInTicket(String ticketCodeStr) {
+    public CheckInResponse checkInTicket(String ticketCode) {
         // T2: Reuse validation logic first
-        TicketValidationResponse validation = validateTicket(ticketCodeStr);
+        TicketValidationResponse validation = validateTicket(ticketCode);
 
         // T3: If not valid, return failure response immediately
         if (!"VALID".equals(validation.getStatus())) {
@@ -88,7 +77,6 @@ public class CheckInService {
         }
 
         // T4-T6: Fetch the ticket, update status, and set timestamp
-        UUID ticketCode = UUID.fromString(ticketCodeStr);
         Ticket ticket = ticketRepository.findByTicketCode(ticketCode)
                 .orElseThrow(() -> new RuntimeException("Ticket not found during execution"));
 

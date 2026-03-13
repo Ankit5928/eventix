@@ -30,8 +30,10 @@ export interface PublicEventDetailDTO {
 }
 
 export interface ReservationRequest {
-  ticketCategoryId: string; // UUID
-  quantity: number;
+  items: {
+    ticketCategoryId: string;
+    quantity: number;
+  }[];
 }
 
 export interface ReservationResponse {

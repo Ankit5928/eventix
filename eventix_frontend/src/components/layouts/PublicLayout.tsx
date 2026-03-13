@@ -17,6 +17,9 @@ export default function PublicLayout() {
             </span>
           </Link>
           <nav className="flex items-center gap-4">
+            <Link to="/my-tickets" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
+              My Tickets
+            </Link>
             {isAuthenticated ? (
               <Button asChild variant="default" size="sm">
                 <Link to="/dashboard">Dashboard</Link>

@@ -13,7 +13,9 @@ import java.util.UUID;
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Order {
     @Id
-    private UUID id = UUID.randomUUID();
+    @GeneratedValue // This tells JPA to handle the generation
+    @Column(columnDefinition = "UUID", updatable = false, nullable = false)
+    private UUID id;
 
     @OneToOne
     @JoinColumn(name = "reservation_id")
@@ -36,5 +38,14 @@ public class Order {
     private List<OrderItem> items = new ArrayList<>();
 
     private LocalDateTime createdAt;
+
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        if (this.id == null) {
+            this.id = UUID.randomUUID();
+        }
+    }
 
 }

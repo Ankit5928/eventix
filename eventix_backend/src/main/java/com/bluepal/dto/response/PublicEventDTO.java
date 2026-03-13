@@ -14,5 +14,5 @@ public class PublicEventDTO {
     private LocalDateTime startDate;
     private String location;
     private String imageUrl;
-    private Double startingPrice; // T5: Min price across all categories
+    private Double minPrice; // T5: Min price across all categories
 }

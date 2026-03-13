@@ -54,15 +54,19 @@ public class PublicEventController {
         return ResponseEntity.ok(response);
     }
 
+    // Inside PublicEventController.java
     @GetMapping
     public ResponseEntity<Page<PublicEventDTO>> getAllPublicEvents(
             @RequestParam(required = false) String search,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+            // Map 'start' from frontend to 'startDate' in Java
+            @RequestParam(name = "start", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            // Map 'end' from frontend to 'endDate' in Java
+            @RequestParam(name = "end", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size) {
 
-        // Route to the service method that handles all optional filters
         return ResponseEntity.ok(eventService.getPublicEvents(search, startDate, endDate, page, size));
     }
 

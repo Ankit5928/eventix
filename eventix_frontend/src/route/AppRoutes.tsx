@@ -13,9 +13,12 @@ import DashboardPage from "../pages/DashboardPage";
 import EventsPage from "../pages/EventsPage";
 import AttendeesPage from "../pages/AttendeesPage";
 import SettingsPage from "../pages/SettingsPage";
+import CheckInPage from "../pages/CheckInPage";
 import EventListingPage from "../pages/public/EventListingPage";
 import EventDetailPage from "../pages/public/EventDetailPage";
 import CheckoutPage from "../pages/public/CheckoutPage";
+import PaymentSuccessPage from "../pages/public/PaymentSuccessPage";
+import MyTicketsPage from "../pages/public/MyTicketsPage";
 
 const AppRoutes = () => {
   const { user } = useAppSelector((state) => state.auth);
@@ -27,6 +30,8 @@ const AppRoutes = () => {
         <Route path="/" element={<EventListingPage />} />
         <Route path="/event/:id" element={<EventDetailPage />} />
         <Route path="/checkout/:reservationId" element={<CheckoutPage />} />
+        <Route path="/payment-success" element={<PaymentSuccessPage />} />
+        <Route path="/my-tickets" element={<MyTicketsPage />} />
       </Route>
 
       {/* AUTH ROUTES */}
@@ -48,6 +53,7 @@ const AppRoutes = () => {
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/events" element={<EventsPage />} />
         <Route path="/events/:eventId/attendees" element={<AttendeesPage />} />
+        <Route path="/check-in" element={<CheckInPage />} />
         <Route path="/settings" element={<SettingsPage />} />
       </Route>
     </Routes>

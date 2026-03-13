@@ -22,6 +22,6 @@ public class EventResponse {
     private String timezone; // Ensure this field exists
     private String visibility;
     private String status;
-    private String imagePath;
+    private String imageUrl;
     private LocalDateTime createdAt;
 }

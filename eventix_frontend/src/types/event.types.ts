@@ -20,7 +20,7 @@ export interface EventResponse {
   timezone: string;
   visibility: string;
   status: string;
-  imagePath: string | null;
+  imageUrl: string | null;
   createdAt: string;
 }
 
@@ -29,7 +29,7 @@ export interface EventListItemDTO {
   title: string;
   startDate: string;
   location: string;
-  imagePath: string | null;
+  imageUrl: string | null;
   status: string;
   ticketsSold: number;
 }

@@ -16,6 +16,15 @@ import java.util.UUID;
 public interface TicketRepository extends JpaRepository<Ticket, UUID> {
     List<Ticket> findByOrderId(UUID orderId);
     boolean existsByOrderId(UUID orderId);
+
+    @Query("SELECT t FROM Ticket t " +
+            "JOIN FETCH t.ticketCategory tc " +
+            "JOIN FETCH t.order o " +
+            "JOIN FETCH o.reservation r " +
+            "JOIN FETCH r.event e " +
+            "WHERE LOWER(t.attendeeEmail) = LOWER(:email) " +
+            "ORDER BY e.startDate DESC")
+    List<Ticket> findByAttendeeEmailIgnoreCase(@Param("email") String email);
     // Add to TicketRepository.java
     @Query("SELECT new com.bluepal.dto.response.CheckInStatsDTO$CategoryBreakdownDTO(" +
             "tc.name, " +
@@ -25,7 +34,7 @@ public interface TicketRepository extends JpaRepository<Ticket, UUID> {
             "WHERE t.order.reservation.event.id = :eventId " +
             "GROUP BY tc.name")
     List<CheckInStatsDTO.CategoryBreakdownDTO> getCategoryBreakdown(@Param("eventId") Long eventId);
-    Optional<Ticket> findByTicketCode(UUID ticketCode);
+    Optional<Ticket> findByTicketCode(String ticketCode);
 
     @Query("SELECT t FROM Ticket t " +
             "WHERE t.order.reservation.event.id = :eventId " +

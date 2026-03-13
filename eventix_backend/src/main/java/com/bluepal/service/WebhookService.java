@@ -120,10 +120,11 @@ public class WebhookService {
         res.getItems().forEach(resItem -> {
             for (int i = 0; i < resItem.getQuantity(); i++) {
                 UUID ticketId = UUID.randomUUID();
-                UUID ticketCode = UUID.randomUUID();
+                // Generate a 12-digit numeric ticket code
+                String ticketCode = String.format("%012d", java.util.concurrent.ThreadLocalRandom.current().nextLong(100000000000L, 1000000000000L));
 
                 // T10: Save QR code file
-                String qrPath = qrCodeService.generateQRCode(ticketId, ticketCode.toString());
+                String qrPath = qrCodeService.generateQRCode(ticketId, ticketCode);
 
                 Ticket ticket = Ticket.builder()
                         .id(ticketId)

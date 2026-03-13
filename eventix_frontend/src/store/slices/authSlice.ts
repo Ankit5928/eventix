@@ -1,9 +1,10 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface User {
   id: string;
   email: string;
   roles: string[];
+  currentOrganizationId: number;
 }
 
 interface AuthState {
@@ -15,20 +16,24 @@ interface AuthState {
 }
 
 const initialState: AuthState = {
-  token: localStorage.getItem('token'),
+  token: localStorage.getItem("token"),
   user: null, // In a real app we'd decode the JWT to get the user info initially
-  isAuthenticated: !!localStorage.getItem('token'),
-  currentOrganizationId: localStorage.getItem('currentOrganizationId'),
+  isAuthenticated: !!localStorage.getItem("token"),
+  currentOrganizationId: localStorage.getItem("currentOrganizationId"),
   organizationIds: [],
 };
 
 const authSlice = createSlice({
-  name: 'auth',
+  name: "auth",
   initialState,
   reducers: {
     setCredentials: (
       state,
-      action: PayloadAction<{ token: string; user: User; organizationIds: string[] }>
+      action: PayloadAction<{
+        token: string;
+        user: User;
+        organizationIds: string[];
+      }>,
     ) => {
       state.token = action.payload.token;
       state.user = action.payload.user;
@@ -36,9 +41,12 @@ const authSlice = createSlice({
       state.organizationIds = action.payload.organizationIds;
       if (action.payload.organizationIds.length > 0) {
         state.currentOrganizationId = action.payload.organizationIds[0];
-        localStorage.setItem('currentOrganizationId', state.currentOrganizationId);
+        localStorage.setItem(
+          "currentOrganizationId",
+          state.currentOrganizationId,
+        );
       }
-      localStorage.setItem('token', action.payload.token);
+      localStorage.setItem("token", action.payload.token);
     },
     logout: (state) => {
       state.token = null;
@@ -46,12 +54,12 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       state.currentOrganizationId = null;
       state.organizationIds = [];
-      localStorage.removeItem('token');
-      localStorage.removeItem('currentOrganizationId');
+      localStorage.removeItem("token");
+      localStorage.removeItem("currentOrganizationId");
     },
     switchOrganization: (state, action: PayloadAction<string>) => {
       state.currentOrganizationId = action.payload;
-      localStorage.setItem('currentOrganizationId', action.payload);
+      localStorage.setItem("currentOrganizationId", action.payload);
     },
   },
 });
