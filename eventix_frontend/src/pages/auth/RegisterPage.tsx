@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
-import { AlertCircle, CheckCircle2, Ticket, Shield, ChevronRight, Sparkles, Crown } from "lucide-react";
+import { AlertCircle, Ticket, Sparkles, Crown } from "lucide-react";
 import apiClient from "../../service/api";
 
 const RegisterPage = () => {
@@ -73,25 +73,26 @@ const RegisterPage = () => {
   ];
 
   return (
-    <div className={`h-screen w-screen flex flex-col lg:flex-row overflow-hidden bg-[#1A0000] ${mounted ? 'opacity-100' : 'opacity-0'} transition-opacity duration-1000`} style={{ fontFamily: "'Playfair Display', serif" }}>
+    <div className={`h-screen w-screen flex flex-col lg:flex-row overflow-hidden bg-black ${mounted ? 'opacity-100' : 'opacity-0'} transition-opacity duration-1000`} style={{ fontFamily: "'Playfair Display', serif" }}>
+      <div className="smoke-overlay" />
       {/* Left Side: Cinematic Narrative */}
       <div className="lg:w-[60%] relative hidden lg:block overflow-hidden border-r border-white/5">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#1A0000] via-transparent to-transparent z-10" />
-        <div className="absolute -top-24 -left-24 w-96 h-96 bg-[#FF3333]/10 rounded-full blur-[120px] animate-pulse" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#FF0000]/10 via-transparent to-transparent z-10" />
+        <div className="absolute -top-24 -left-24 w-96 h-96 bg-[#FF0000]/5 rounded-full blur-[120px] animate-pulse" />
 
         <div className="relative h-full w-full p-16 flex flex-col justify-between z-20">
           <div className="flex items-center gap-4 animate-fade-in-up">
-            <div className="w-12 h-12 bg-gradient-to-br from-[#FF3333] to-[#990000] rounded-xl flex items-center justify-center shadow-2xl shadow-[#FF3333]/30">
+            <div className="w-12 h-12 bg-gradient-to-br from-[#FF0000] to-[#4D0000] rounded-xl flex items-center justify-center shadow-2xl shadow-red-600/30">
               <Ticket className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-black tracking-tighter text-white uppercase italic">Event<span className="text-[#FF3333]">ix</span></h2>
-              <p className="text-[10px] tracking-[0.4em] text-white/30 uppercase font-bold">Consortium Protocol</p>
+              <h2 className="text-2xl font-black tracking-tighter text-white uppercase italic">Event<span className="text-[#FF0000]">ix</span></h2>
+              <p className="text-[10px] tracking-[0.4em] text-white/40 uppercase font-bold">Consortium Protocol</p>
             </div>
           </div>
 
           <div className="max-w-xl space-y-6">
-            <div className="flex items-center gap-2 text-[#FF3333]">
+            <div className="flex items-center gap-2 text-[#FF0000]">
               <Crown className="h-4 w-4" />
               <span className="text-xs font-bold uppercase tracking-[0.3em]">Founding Partner Program</span>
             </div>
@@ -106,7 +107,7 @@ const RegisterPage = () => {
 
           <div className="grid grid-cols-4 gap-4">
             {showcaseImages.map((img, i) => (
-              <div key={i} className="group relative h-28 rounded-xl overflow-hidden border border-white/10 transition-all hover:scale-105 hover:border-[#FF3333]/50">
+              <div key={i} className="group relative h-28 rounded-xl overflow-hidden border border-white/20 transition-all hover:scale-105 hover:border-[#D4AF37]/50">
                 <img src={img.src} alt={img.cat} className="w-full h-full object-cover brightness-50 group-hover:brightness-100 transition-all duration-700" />
               </div>
             ))}
@@ -115,16 +116,16 @@ const RegisterPage = () => {
       </div>
 
       {/* Right Side: Slim Luxury Terminal */}
-      <div className="flex-1 flex items-center justify-center p-8 lg:p-12 bg-gradient-to-b from-[#111] to-[#0A0000] relative">
-        <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: `radial-gradient(#FF3333 0.5px, transparent 0.5px)`, backgroundSize: '32px 32px' }}></div>
+      <div className="flex-1 flex items-center justify-center p-8 lg:p-12 bg-gradient-to-b from-black to-[#1a0000] relative">
+        <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: `radial-gradient(#FF0000 0.5px, transparent 0.5px)`, backgroundSize: '32px 32px' }}></div>
 
-        <div className={`w-full max-w-[340px] bg-gradient-to-b from-[#1A0000] to-[#050000] backdrop-blur-3xl border border-white/10 shadow-[0_50px_100px_-20px_rgba(0,0,0,1)] relative overflow-hidden rounded-[2.5rem] transition-all duration-1000 delay-500 ${mounted ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-10 opacity-0 scale-95'}`}>
+        <div className={`w-full max-w-[340px] bg-[#050505]/80 backdrop-blur-3xl border border-white/5 shadow-[0_50px_100px_-20px_rgba(0,0,0,1)] relative overflow-hidden rounded-[2.5rem] transition-all duration-1000 delay-500 ${mounted ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-10 opacity-0 scale-95'}`}>
 
-          <div className="h-px w-full bg-gradient-to-r from-transparent via-[#FF3333] to-transparent" />
+          <div className="h-px w-full bg-gradient-to-r from-transparent via-[#FF0000] to-transparent" />
 
           <div className="space-y-3 pt-10 pb-4 text-center px-8">
             <div className="mx-auto w-14 h-14 bg-white/[0.03] border border-white/5 rounded-full flex items-center justify-center relative">
-              <Sparkles className="h-6 w-6 text-[#FF3333]" />
+              <Sparkles className="h-6 w-6 text-[#FF0000]" />
             </div>
             <div className="space-y-1">
               <h2 className="text-2xl font-bold tracking-tight text-white uppercase italic">Join Consortium</h2>
@@ -194,7 +195,7 @@ const RegisterPage = () => {
               <Button
                 type="submit"
                 disabled={isLoading || success}
-                className="w-full h-11 bg-gradient-to-r from-[#FF3333] to-[#990000] hover:brightness-110 text-white border-0 rounded-xl font-black text-[10px] uppercase tracking-[0.3em] transition-all shadow-xl shadow-[#FF3333]/10 mt-2"
+                className="w-full h-11 bg-gradient-to-r from-[#D4AF37] to-[#8B732A] hover:brightness-110 text-white border-0 rounded-xl font-black text-[10px] uppercase tracking-[0.3em] transition-all shadow-xl shadow-[#D4AF37]/10 mt-2"
               >
                 {isLoading ? "Synchronizing..." : "Initialize Access"}
               </Button>
@@ -205,7 +206,7 @@ const RegisterPage = () => {
             <div className="w-full h-px bg-white/10" />
             <div className="text-center">
               <p className="text-[10px] text-white/40 font-bold uppercase tracking-[0.2em]">
-                Existing Partner? <Link to="/login" className="text-[#FF3333] hover:text-white transition-colors">Sign In</Link>
+                Existing Partner? <Link to="/login" className="text-[#FF0000] hover:text-white transition-colors">Sign In</Link>
               </p>
             </div>
           </div>
@@ -214,7 +215,7 @@ const RegisterPage = () => {
 
       <style>{`
         .premium-gradient-text {
-          background: linear-gradient(to right, #FF3333, #FF6666, #FF3333);
+          background: linear-gradient(to right, #FF0000, #8B0000, #FF0000);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-size: 200% auto;

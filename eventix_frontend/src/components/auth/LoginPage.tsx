@@ -6,13 +6,11 @@ import {
   Card,
   CardContent,
   CardHeader,
-  CardTitle,
-  CardDescription,
   CardFooter,
 } from "../ui/Card";
 import { Input } from "../ui/Input";
 import { Button } from "../ui/Button";
-import { AlertCircle, Calendar, Users, Award, Globe, Shield, Mail, Lock, ChevronRight, Sparkles } from "lucide-react";
+import { AlertCircle, Shield, Mail, Lock, ChevronRight, Sparkles } from "lucide-react";
 import apiClient from "../../service/api";
 
 export default function LoginPage() {
@@ -67,36 +65,37 @@ export default function LoginPage() {
   ];
 
   return (
-    <div className={`h-screen w-screen flex flex-col lg:flex-row overflow-hidden bg-[#0A0000] ${mounted ? 'opacity-100' : 'opacity-0'} transition-opacity duration-1000`} style={{ fontFamily: "'Playfair Display', serif" }}>
+    <div className={`h-screen w-screen flex flex-col lg:flex-row overflow-hidden bg-black ${mounted ? 'opacity-100' : 'opacity-0'} transition-opacity duration-1000`} style={{ fontFamily: "'Playfair Display', serif" }}>
+      <div className="smoke-overlay" />
 
       {/* Left Side: Cinematic Narrative */}
-      <div className="lg:w-[55%] relative hidden lg:block overflow-hidden border-r border-white/5">
+      <div className="lg:w-[55%] relative hidden lg:block overflow-hidden border-r border-white/10">
         {/* Moving Background Glows */}
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[#1A0000] via-transparent to-transparent z-10" />
-        <div className="absolute -top-24 -left-24 w-96 h-96 bg-[#FF3333]/10 rounded-full blur-[120px] animate-pulse" />
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[#FF0000]/10 via-transparent to-transparent z-10" />
+        <div className="absolute -top-24 -left-24 w-96 h-96 bg-[#FF0000]/5 rounded-full blur-[120px] animate-pulse" />
 
         <div className="relative h-full w-full p-12 flex flex-col justify-between z-20">
           {/* Branding */}
           <div className="flex items-center gap-4 animate-fade-in-up">
-            <div className="w-12 h-12 bg-gradient-to-br from-[#FF3333] to-[#990000] rounded-xl flex items-center justify-center shadow-2xl shadow-[#FF3333]/30">
+            <div className="w-12 h-12 bg-gradient-to-br from-[#FF0000] to-[#4D0000] rounded-xl flex items-center justify-center shadow-2xl shadow-red-600/30">
               <span className="text-2xl font-bold text-white tracking-tighter italic">E</span>
             </div>
             <div>
-              <h2 className="text-2xl font-black tracking-tighter text-white uppercase italic">Event<span className="text-[#FF3333]">ix</span></h2>
+              <h2 className="text-2xl font-black tracking-tighter text-white uppercase italic">Event<span className="text-[#FF0000]">ix</span></h2>
               <p className="text-[10px] tracking-[0.4em] text-white/40 uppercase font-bold">International Consortium</p>
             </div>
           </div>
 
           {/* Main Hero Text */}
           <div className="max-w-xl space-y-6">
-            <div className="flex items-center gap-2 text-[#FF3333]">
+            <div className="flex items-center gap-2 text-[#D4AF37]">
               <Sparkles className="h-4 w-4" />
               <span className="text-xs font-bold uppercase tracking-[0.3em]">Access Granted to the Elite</span>
             </div>
-            <h1 className="text-6xl xl:text-7xl font-bold text-white tracking-tighter leading-[0.9] italic">
+            <h1 className="text-6xl xl:text-7xl font-bold text-[#1a2f1a] tracking-tighter leading-[0.9] italic">
               Curating <span className="premium-gradient-text">World Class</span> Narratives.
             </h1>
-            <p className="text-white/50 text-lg font-light leading-relaxed max-w-md italic">
+            <p className="text-[#1a2f1a]/50 text-lg font-light leading-relaxed max-w-md italic">
               The global terminal for high-stakes organizers. Manage legendary experiences with unparalleled precision.
             </p>
           </div>
@@ -104,10 +103,10 @@ export default function LoginPage() {
           {/* Mini Portfolio Preview */}
           <div className="grid grid-cols-4 gap-4">
             {eventImages.map((img, i) => (
-              <div key={i} className="group relative h-32 rounded-xl overflow-hidden border border-white/10 transition-all hover:scale-105 hover:border-[#FF3333]/50">
+              <div key={i} className="group relative h-32 rounded-xl overflow-hidden border border-white/20 transition-all hover:scale-105 hover:border-[#FF0000]/50">
                 <img src={img.src} alt={img.title} className="w-full h-full object-cover brightness-50 group-hover:brightness-100 transition-all" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <p className="text-[8px] text-[#FF3333] font-bold uppercase tracking-widest">{img.cat}</p>
+                  <p className="text-[8px] text-[#FF0000] font-bold uppercase tracking-widest">{img.cat}</p>
                   <p className="text-[10px] text-white font-bold leading-tight">{img.title}</p>
                 </div>
               </div>
@@ -117,22 +116,22 @@ export default function LoginPage() {
       </div>
 
       {/* Right Side: Luxury Authentication Terminal */}
-      <div className="flex-1 flex items-center justify-center p-6 bg-gradient-to-b from-[#111] to-[#0A0000] relative">
+      <div className="flex-1 flex items-center justify-center p-6 bg-gradient-to-b from-black to-[#1a0000] relative">
         {/* Subtle Grid Background */}
-        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: `radial-gradient(#FF3333 0.5px, transparent 0.5px)`, backgroundSize: '24px 24px' }}></div>
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: `radial-gradient(#FF0000 0.5px, transparent 0.5px)`, backgroundSize: '24px 24px' }}></div>
 
-        <Card className={`w-full max-w-[420px] bg-white/[0.02] backdrop-blur-3xl border border-white/10 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] relative overflow-hidden transition-all duration-1000 delay-500 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'}`}>
+        <Card className={`w-full max-w-[420px] bg-[#050505]/80 backdrop-blur-3xl border border-white/5 shadow-[0_50px_100px_-20px_rgba(0,0,0,1)] relative overflow-hidden transition-all duration-1000 delay-500 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'}`}>
           {/* Top Accent Line */}
-          <div className="h-0.5 w-full bg-gradient-to-r from-transparent via-[#FF3333] to-transparent opacity-50" />
+          <div className="h-0.5 w-full bg-gradient-to-r from-transparent via-[#FF0000] to-transparent opacity-50" />
 
           <CardHeader className="space-y-6 pt-12 pb-8 text-center">
-            <div className="mx-auto w-20 h-20 bg-white/[0.03] border border-white/10 rounded-full flex items-center justify-center relative group">
-              <Shield className="h-8 w-8 text-[#FF3333] transition-transform group-hover:scale-110" />
-              <div className="absolute inset-0 rounded-full border border-[#FF3333]/20 animate-ping opacity-20" />
+            <div className="mx-auto w-20 h-20 bg-white/[0.03] border border-white/5 rounded-full flex items-center justify-center relative group">
+              <Shield className="h-8 w-8 text-[#FF0000] transition-transform group-hover:scale-110" />
+              <div className="absolute inset-0 rounded-full border border-[#FF0000]/20 animate-ping opacity-20" />
             </div>
             <div className="space-y-2">
-              <CardTitle className="text-3xl font-bold tracking-tighter text-white uppercase italic">Terminal Login</CardTitle>
-              <CardDescription className="text-white/40 text-xs font-bold uppercase tracking-[0.2em]">Authorized Personnel Only</CardDescription>
+              <h2 className="text-3xl font-bold tracking-tighter text-white uppercase italic">Terminal Login</h2>
+              <p className="text-white/40 text-xs font-bold uppercase tracking-[0.2em]">Authorized Personnel Only</p>
             </div>
           </CardHeader>
 
@@ -154,9 +153,9 @@ export default function LoginPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     disabled={isLoading}
-                    className="h-14 bg-white/[0.03] border-white/10 rounded-xl focus:border-[#FF3333]/50 focus:bg-white/[0.05] transition-all text-white placeholder:text-white/10 text-xs font-bold tracking-widest"
+                    className="h-14 bg-white/[0.03] border-white/10 rounded-xl focus:border-[#FF0000]/50 focus:bg-white/[0.05] transition-all text-white placeholder:text-white/10 text-xs font-bold tracking-widest"
                   />
-                  <Mail className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/10 group-focus-within:text-[#FF3333]/50 transition-colors" />
+                  <Mail className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/10 group-focus-within:text-[#FF0000]/50 transition-colors" />
                 </div>
               </div>
 
@@ -170,16 +169,16 @@ export default function LoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={isLoading}
-                    className="h-14 bg-white/[0.03] border-white/10 rounded-xl focus:border-[#FF3333]/50 focus:bg-white/[0.05] transition-all text-white placeholder:text-white/10 text-xs font-bold tracking-widest"
+                    className="h-14 bg-white/[0.03] border-white/10 rounded-xl focus:border-[#FF0000]/50 focus:bg-white/[0.05] transition-all text-white placeholder:text-white/10 text-xs font-bold tracking-widest"
                   />
-                  <Lock className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/10 group-focus-within:text-[#FF3333]/50 transition-colors" />
+                  <Lock className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/10 group-focus-within:text-[#FF0000]/50 transition-colors" />
                 </div>
               </div>
 
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-14 bg-gradient-to-r from-[#FF3333] to-[#990000] hover:from-[#CC0000] hover:to-[#770000] text-white border-0 rounded-xl font-black text-[11px] uppercase tracking-[0.3em] shadow-2xl shadow-[#FF3333]/20 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3"
+                className="w-full h-14 bg-gradient-to-r from-[#FF0000] to-[#4D0000] hover:brightness-125 text-white border-0 rounded-xl font-black text-[11px] uppercase tracking-[0.3em] shadow-2xl shadow-red-900/50 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3"
               >
                 {isLoading ? (
                   <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
@@ -193,8 +192,8 @@ export default function LoginPage() {
           <CardFooter className="flex flex-col gap-6 pt-0 pb-12 px-10 border-0">
             <div className="w-full h-px bg-white/5" />
             <div className="flex flex-col items-center gap-4">
-              <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">
-                New Strategist? <Link to="/register" className="text-[#FF3333] hover:text-white transition-colors">Request Access</Link>
+              <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest">
+                New Strategist? <Link to="/register" className="text-[#FF0000] hover:text-white transition-colors">Request Access</Link>
               </p>
               <div className="flex gap-6">
                 {['Privacy', 'Protocol', 'Terms'].map((item) => (
@@ -208,7 +207,7 @@ export default function LoginPage() {
 
       <style>{`
         .premium-gradient-text {
-          background: linear-gradient(to right, #FF3333, #FF6666, #FF3333);
+          background: linear-gradient(to right, #FF0000, #8B0000, #FF0000);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-size: 200% auto;

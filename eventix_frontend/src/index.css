@@ -13,28 +13,27 @@
 
 @layer base {
   :root {
-    /* Synchronized to your International Red/Obsidian theme */
-    --background: 0 0% 4%;
-    --foreground: 0 0% 98%;
+    /* Obsidian Smoke & Crimson Palette */
+    --background: 0 0% 0%; /* Pure Black */
+    --foreground: 0 0% 100%; /* Pure White */
     --card: 0 0% 4%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 4%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 2%;
     --popover-foreground: 0 0% 98%;
-    --primary: 0 100% 60%;
-    /* #FF3333 */
+    --primary: 0 100% 50%; /* Neon Crimson #FF0000 */
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 100% 60%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 12%;
+    --secondary: 0 0% 8%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 60%;
+    --accent: 0 100% 45%; 
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 100% 35%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 15%;
     --input: 0 0% 12%;
-    --ring: 0 100% 60%;
-    --radius: 1.25rem;
+    --ring: 0 100% 50%;
+    --radius: 2rem;
   }
 }
 
@@ -44,69 +43,78 @@
   }
 
   body {
-    /* Force Obsidian background globally */
-    @apply bg-[#0A0000] text-foreground font-sans antialiased;
+    @apply bg-black text-foreground font-sans antialiased;
     overflow-x: hidden;
   }
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    @apply font-heading tracking-tight;
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading tracking-tight text-white;
   }
 }
 
 @layer components {
 
-  /* The "Master" Wrapper - Updated to deep obsidian */
+  /* Obsidian Page Container - Deep Gradient */
   .premium-page-container {
-    @apply min-h-screen w-full relative overflow-hidden bg-[#0A0000] text-white;
+    @apply min-h-screen w-full relative overflow-hidden bg-gradient-to-b from-[#000000] via-[#050000] to-[#1a0000] text-white;
     font-family: 'Inter', sans-serif;
-    /* Content is Inter, Headings are Olivia */
   }
 
-  /* Fixed Background Overlays for Cinematic Depth */
+  /* Smoke Effect Overlay */
+  .smoke-overlay {
+    @apply absolute inset-0 z-0 pointer-events-none opacity-40;
+    background: 
+      radial-gradient(circle at 20% 30%, rgba(255, 0, 0, 0.05) 0%, transparent 40%),
+      radial-gradient(circle at 80% 70%, rgba(139, 0, 0, 0.05) 0%, transparent 40%);
+    filter: blur(60px);
+    animation: smoke-move 20s infinite alternate linear;
+  }
+
+  @keyframes smoke-move {
+    from { transform: translate(0, 0) scale(1); }
+    to { transform: translate(50px, 30px) scale(1.1); }
+  }
+
+  /* Red Glow Layer */
   .premium-bg-overlay {
     @apply absolute inset-0 z-0 pointer-events-none;
-    background: radial-gradient(circle at 50% 50%, #1A0000 0%, #0A0000 100%);
+    background: radial-gradient(circle at 50% 50%, rgba(255, 0, 0, 0.03) 0%, transparent 80%);
   }
 
   /* High-Fashion Title Style */
   .premium-title {
-    @apply text-5xl lg:text-8xl font-bold tracking-tighter text-center italic;
+    @apply text-5xl lg:text-8xl font-bold tracking-tighter text-center italic text-white;
     font-family: 'Playfair Display', serif;
+    text-shadow: 0 0 40px rgba(255, 0, 0, 0.2);
   }
 
-  /* Animated Red Gradient Text */
+  /* Animated Crimson Gradient Text */
   .premium-gradient-text {
-    @apply bg-gradient-to-r from-[#FF3333] via-[#FF6666] to-[#FF3333] bg-clip-text text-transparent animate-gradient;
+    @apply bg-gradient-to-r from-[#FF0000] via-[#8B0000] to-[#FF0000] bg-clip-text text-transparent animate-gradient;
     background-size: 200% auto;
   }
 
-  /* Luxury Buttons */
+  /* luxury Buttons - Crimson Glow */
   .premium-button {
-    @apply bg-gradient-to-r from-[#FF3333] to-[#990000] hover:brightness-125 text-white font-black uppercase tracking-[0.2em] rounded-xl transition-all duration-500 shadow-xl shadow-[#FF3333]/10 transform hover:-translate-y-0.5 active:scale-95;
+    @apply bg-gradient-to-r from-[#FF0000] to-[#4D0000] hover:brightness-125 text-white font-black uppercase tracking-[0.2em] rounded-2xl transition-all duration-500 shadow-2xl shadow-red-900/50 transform hover:-translate-y-1 active:scale-95;
   }
 
-  /* Glassmorphism Cards */
+  /* High-Contrast Glass Cards - Dark Obsidian */
   .premium-card {
-    @apply bg-white/[0.02] backdrop-blur-3xl border border-white/5 rounded-[2rem] hover:border-[#FF3333]/30 transition-all duration-700 shadow-2xl;
+    @apply bg-[#080808]/80 backdrop-blur-3xl border border-white/5 rounded-[3rem] hover:border-red-600/30 transition-all duration-700 shadow-[0_40px_100px_-20px_rgba(0,0,0,1)];
   }
 
-  /* High-End Scrollbar for Modals and Dashboard */
+  /* High-End Scrollbar */
   .custom-scrollbar::-webkit-scrollbar {
-    width: 4px;
+    width: 6px;
   }
 
   .custom-scrollbar::-webkit-scrollbar-track {
-    @apply bg-transparent;
+    @apply bg-black/50;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    @apply bg-[#FF3333]/20 rounded-full hover:bg-[#FF3333]/40 transition-colors;
+    @apply bg-red-600/20 rounded-full hover:bg-red-600/40 transition-colors;
   }
 }
 

@@ -134,22 +134,23 @@ export default function CheckoutPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0A0000] text-white py-20 px-4">
+    <div className="premium-page-container pb-24 overflow-y-auto">
+      <div className="smoke-overlay" />
       <div className="max-w-3xl mx-auto space-y-10 animate-fade-in-up">
 
         {/* Tactical Header */}
         <div className="text-center space-y-4">
-          <div className="flex items-center justify-center gap-2 text-[#FF3333]">
+          <div className="flex items-center justify-center gap-2 text-[#FF0000]">
             <Sparkles className="h-4 w-4" />
             <span className="text-[10px] font-black uppercase tracking-[0.4em]">Secure Terminal</span>
           </div>
-          <h1 className="text-5xl font-bold tracking-tighter italic">Checkout <span className="text-[#FF3333]">Protocol</span></h1>
+          <h1 className="text-5xl font-bold tracking-tighter italic">Checkout <span className="text-[#FF0000]">Protocol</span></h1>
         </div>
 
         {/* Expiry Clock */}
         {timeLeft && timeLeft !== "EXPIRED" && (
           <div className="flex items-center justify-center gap-3 p-4 bg-white/[0.02] border border-white/5 rounded-2xl">
-            <Clock className="w-4 h-4 text-[#FF3333] animate-pulse" />
+            <Clock className="w-4 h-4 text-[#FF0000] animate-pulse" />
             <span className="text-[10px] font-black uppercase tracking-widest text-white/40">
               Terminal Link Expiry: <span className="text-white font-mono text-xs ml-2">{timeLeft}</span>
             </span>
@@ -166,7 +167,7 @@ export default function CheckoutPage() {
             return (
               <div key={s.key} className="flex items-center flex-1 last:flex-none">
                 <div className="flex flex-col items-center gap-3">
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border transition-all duration-500 ${isActive ? "bg-[#FF3333] border-[#FF3333] shadow-[0_0_20px_#FF3333]/30 text-white" :
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border transition-all duration-500 ${isActive ? "bg-[#FF0000] border-[#FF0000] shadow-[0_0_20px_#FF0000]/30 text-white" :
                       isCompleted ? "bg-green-500/10 border-green-500/20 text-green-500" :
                         "bg-white/[0.02] border-white/5 text-white/20"
                     }`}>
@@ -186,7 +187,7 @@ export default function CheckoutPage() {
 
         <Card className="bg-white/[0.02] backdrop-blur-3xl border-white/5 rounded-[2.5rem] shadow-2xl overflow-hidden relative">
           {/* Top Line Glow */}
-          <div className="absolute top-0 left-0 h-px w-full bg-gradient-to-r from-transparent via-[#FF3333] to-transparent opacity-50" />
+          <div className="absolute top-0 left-0 h-px w-full bg-gradient-to-r from-transparent via-[#FF0000] to-transparent opacity-50" />
 
           <CardHeader className="p-10 border-b border-white/5">
             <div className="flex justify-between items-end">
@@ -220,7 +221,7 @@ export default function CheckoutPage() {
                     <Input
                       value={attendee.firstName}
                       onChange={(e) => setAttendee({ ...attendee, firstName: e.target.value })}
-                      className="h-12 bg-white/[0.03] border-white/10 rounded-xl focus:border-[#FF3333]/50 text-white text-xs font-bold"
+                      className="h-12 bg-white/[0.03] border-white/10 rounded-xl focus:border-[#FF0000]/50 text-white text-xs font-bold"
                       placeholder="GIVEN NAME"
                     />
                   </div>
@@ -229,7 +230,7 @@ export default function CheckoutPage() {
                     <Input
                       value={attendee.lastName}
                       onChange={(e) => setAttendee({ ...attendee, lastName: e.target.value })}
-                      className="h-12 bg-white/[0.03] border-white/10 rounded-xl focus:border-[#FF3333]/50 text-white text-xs font-bold"
+                      className="h-12 bg-white/[0.03] border-white/10 rounded-xl focus:border-[#FF0000]/50 text-white text-xs font-bold"
                       placeholder="SURNAME"
                     />
                   </div>
@@ -240,7 +241,7 @@ export default function CheckoutPage() {
                     type="email"
                     value={attendee.email}
                     onChange={(e) => setAttendee({ ...attendee, email: e.target.value })}
-                    className="h-12 bg-white/[0.03] border-white/10 rounded-xl focus:border-[#FF3333]/50 text-white text-xs font-bold"
+                    className="h-12 bg-white/[0.03] border-white/10 rounded-xl focus:border-[#FF0000]/50 text-white text-xs font-bold"
                     placeholder="EMAIL IDENTITY"
                   />
                 </div>
@@ -250,7 +251,7 @@ export default function CheckoutPage() {
                     type="tel"
                     value={attendee.phone}
                     onChange={(e) => setAttendee({ ...attendee, phone: e.target.value })}
-                    className="h-12 bg-white/[0.03] border-white/10 rounded-xl focus:border-[#FF3333]/50 text-white text-xs font-bold"
+                    className="h-12 bg-white/[0.03] border-white/10 rounded-xl focus:border-[#FF0000]/50 text-white text-xs font-bold"
                     placeholder="TELEPHONE"
                   />
                 </div>
@@ -260,15 +261,15 @@ export default function CheckoutPage() {
                     type="checkbox"
                     checked={attendee.termsAccepted}
                     onChange={(e) => setAttendee({ ...attendee, termsAccepted: e.target.checked })}
-                    className="mt-1 h-4 w-4 rounded-lg bg-black border-white/10 text-[#FF3333] focus:ring-0 cursor-pointer"
+                    className="mt-1 h-4 w-4 rounded-lg bg-black border-white/10 text-[#FF0000] focus:ring-0 cursor-pointer"
                   />
                   <span className="text-[10px] text-white/40 uppercase font-bold tracking-wider leading-relaxed">
-                    I acknowledge and authorize the <a href="#" className="text-white underline decoration-[#FF3333]">Deployment Terms</a> and operational protocols.
+                    I acknowledge and authorize the <a href="#" className="text-white underline decoration-[#FF0000]">Deployment Terms</a> and operational protocols.
                   </span>
                 </label>
 
                 <div className="flex justify-end pt-4">
-                  <Button variant="premium" onClick={handleAttendeeSubmit} disabled={loading} className="h-12 px-10 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-[#FF3333]/20 border-0">
+                  <Button variant="premium" onClick={handleAttendeeSubmit} disabled={loading} className="h-12 px-10 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-[#FF0000]/20 border-0">
                     {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "PROCEED TO MANIFEST →"}
                   </Button>
                 </div>
@@ -291,8 +292,8 @@ export default function CheckoutPage() {
                         <span className="text-xs font-bold text-white uppercase italic">{item.val}</span>
                       </div>
                     ))}
-                    <div className="flex justify-between items-center p-8 bg-gradient-to-r from-[#FF3333]/10 to-transparent rounded-[2rem] border border-[#FF3333]/20 mt-10">
-                      <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#FF3333]">Total Gross Valuation</span>
+                    <div className="flex justify-between items-center p-8 bg-gradient-to-r from-[#FF0000]/10 to-transparent rounded-[2rem] border border-[#FF0000]/20 mt-10">
+                      <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#FF0000]">Total Gross Valuation</span>
                       <span className="text-3xl font-bold tracking-tighter text-white">${summary.totalAmount?.toFixed(2)}</span>
                     </div>
                   </div>
@@ -321,7 +322,7 @@ export default function CheckoutPage() {
                       clientSecret,
                       appearance: {
                         theme: 'night',
-                        variables: { colorPrimary: '#FF3333', colorBackground: '#0D0D0D' }
+                        variables: { colorPrimary: '#FF0000', colorBackground: '#0D0D0D' }
                       }
                     }}>
                       <PaymentForm
@@ -346,7 +347,7 @@ export default function CheckoutPage() {
         </Card>
 
         <div className="text-center pb-20">
-          <Link to="/" className="text-[9px] font-black uppercase tracking-[0.5em] text-white/10 hover:text-[#FF3333] transition-all flex items-center justify-center gap-2">
+          <Link to="/" className="text-[9px] font-black uppercase tracking-[0.5em] text-white/10 hover:text-[#FF0000] transition-all flex items-center justify-center gap-2">
             Terminate Session & Return
           </Link>
         </div>
