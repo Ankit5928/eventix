@@ -4,7 +4,6 @@ import { fetchOrgDashboard } from "../store/slices/reportSlice";
 import StatCard from "../components/commons/StatCard";
 import ProgressBar from "../components/commons/ProgressBar";
 import { Button } from "../components/ui/Button";
-import Sidebar from "../components/commons/Sidebar"; // Adjusted import path
 import reportService from "../service/reportService";
 import { SalesTimeSeriesDTO } from "../types/report.types";
 import { Download, Loader2, TrendingUp, Crown, Globe } from "lucide-react";

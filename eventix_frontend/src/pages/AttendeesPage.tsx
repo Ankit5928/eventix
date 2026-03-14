@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import {
   Download,
-  Filter,
   Eye,
   ChevronLeft,
   ChevronRight,
@@ -13,13 +12,10 @@ import {
   Mail,
   Search,
   Sparkles,
-  ShieldCheck,
-  Globe,
   Loader2,
 } from "lucide-react";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
-import { Card } from "../components/ui/Card";
 import { Modal } from "../components/ui/Modal";
 import {
   getAttendees,

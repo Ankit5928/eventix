@@ -13,25 +13,25 @@
 
 @layer base {
   :root {
-    /* Obsidian Smoke & Crimson Palette */
-    --background: 222 24% 46%; /* Slate Blue #596891 */
-    --foreground: 0 0% 100%; /* Pure White */
-    --card: 0 0% 4%;
-    --card-foreground: 0 0% 100%;
-    --popover: 0 0% 2%;
-    --popover-foreground: 0 0% 98%;
+    /* Light sky background and dark foreground */
+    --background: 240 67% 94%; /* #e8dff0 */
+    --foreground: 240 6% 12%; /* dark text */
+    --card: 240 30% 100%;
+    --card-foreground: 240 6% 12%;
+    --popover: 240 30% 98%;
+    --popover-foreground: 240 6% 12%;
     --primary: 0 100% 50%; /* Neon Crimson #FF0000 */
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 8%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 0 0% 12%;
-    --muted-foreground: 0 0% 60%;
-    --accent: 0 100% 45%; 
+    --secondary: 240 24% 85%;
+    --secondary-foreground: 240 6% 12%;
+    --muted: 240 20% 92%;
+    --muted-foreground: 240 6% 40%;
+    --accent: 0 100% 45%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 100% 35%;
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 15%;
-    --input: 0 0% 12%;
+    --border: 240 12% 80%;
+    --input: 240 16% 94%;
     --ring: 0 100% 50%;
     --radius: 2rem;
   }
@@ -45,6 +45,16 @@
   body {
     @apply bg-background text-foreground font-sans antialiased;
     overflow-x: hidden;
+  }
+
+  /* Ensure text is readable on the light background (bg-background = #e8dff0). */
+  .bg-background {
+    color: hsl(var(--foreground));
+  }
+
+  /* Prevent accidental "text-white" from becoming invisible on the light background. */
+  .bg-background .text-white {
+    color: hsl(var(--foreground)) !important;
   }
 
   h1, h2, h3, h4, h5, h6 {

@@ -1,19 +1,18 @@
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { CreateTicketCategoryRequest } from '../types/ticket-category.types';
-import { Modal } from '../components/ui/Modal';
-import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
+import React from "react";
+import { useForm } from "react-hook-form";
+import { CreateTicketCategoryRequest } from "../types/ticket-category.types";
+import { Modal } from "../components/ui/Modal";
+import { Button } from "../components/ui/Button";
+import { Input } from "../components/ui/Input";
 import {
-  X,
   Ticket,
   DollarSign,
   Layers,
   Calendar,
   AlignLeft,
   Loader2,
-  Plus
-} from 'lucide-react';
+  Plus,
+} from "lucide-react";
 
 interface AddCategoryModalProps {
   isOpen: boolean;
@@ -22,11 +21,21 @@ interface AddCategoryModalProps {
   isLoading: boolean;
 }
 
-const AddCategoryModal: React.FC<AddCategoryModalProps> = ({ isOpen, onClose, onSubmit, isLoading }) => {
-  const { register, handleSubmit, formState: { errors }, watch } = useForm<CreateTicketCategoryRequest>();
+const AddCategoryModal: React.FC<AddCategoryModalProps> = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  isLoading,
+}) => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+  } = useForm<CreateTicketCategoryRequest>();
 
   // Validation logic for timeline synchronization
-  const salesStartDate = watch('salesStartDate');
+  const salesStartDate = watch("salesStartDate");
 
   return (
     <Modal
@@ -37,7 +46,6 @@ const AddCategoryModal: React.FC<AddCategoryModalProps> = ({ isOpen, onClose, on
       className="max-w-xl"
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 pb-2">
-
         {/* Tier Identity */}
         <div className="space-y-1.5">
           <label className="text-[8px] font-black text-white/30 uppercase tracking-[0.4em] pl-1 flex items-center gap-2">
@@ -47,7 +55,7 @@ const AddCategoryModal: React.FC<AddCategoryModalProps> = ({ isOpen, onClose, on
             placeholder="e.g. VIP CLEARANCE"
             error={errors.name?.message}
             className="h-11 bg-white/[0.03] border-white/10 text-white placeholder:text-white/10 text-xs font-bold tracking-widest"
-            {...register('name', { required: 'Designation required' })}
+            {...register("name", { required: "Designation required" })}
           />
         </div>
 
@@ -55,7 +63,8 @@ const AddCategoryModal: React.FC<AddCategoryModalProps> = ({ isOpen, onClose, on
         <div className="grid grid-cols-2 gap-5">
           <div className="space-y-1.5">
             <label className="text-[8px] font-black text-white/30 uppercase tracking-[0.4em] pl-1 flex items-center gap-2">
-              <DollarSign className="w-3 h-3 text-[#FF3333]" /> Unit Valuation ($)
+              <DollarSign className="w-3 h-3 text-[#FF3333]" /> Unit Valuation
+              ($)
             </label>
             <Input
               type="number"
@@ -63,9 +72,9 @@ const AddCategoryModal: React.FC<AddCategoryModalProps> = ({ isOpen, onClose, on
               placeholder="0.00"
               error={errors.price?.message}
               className="h-11 bg-white/[0.03] border-white/10 text-white text-xs font-bold"
-              {...register('price', {
-                required: 'Valuation required',
-                min: { value: 0, message: 'Invalid valuation' }
+              {...register("price", {
+                required: "Valuation required",
+                min: { value: 0, message: "Invalid valuation" },
               })}
             />
           </div>
@@ -78,9 +87,9 @@ const AddCategoryModal: React.FC<AddCategoryModalProps> = ({ isOpen, onClose, on
               placeholder="100"
               error={errors.quantityTotal?.message}
               className="h-11 bg-white/[0.03] border-white/10 text-white text-xs font-bold"
-              {...register('quantityTotal', {
-                required: 'Quantity required',
-                min: { value: 1, message: 'Min 1 unit' }
+              {...register("quantityTotal", {
+                required: "Quantity required",
+                min: { value: 1, message: "Min 1 unit" },
               })}
             />
           </div>
@@ -96,7 +105,7 @@ const AddCategoryModal: React.FC<AddCategoryModalProps> = ({ isOpen, onClose, on
               type="datetime-local"
               error={errors.salesStartDate?.message}
               className="h-11 bg-white/[0.03] border-white/10 text-white text-[10px]"
-              {...register('salesStartDate', { required: 'Opening required' })}
+              {...register("salesStartDate", { required: "Opening required" })}
             />
           </div>
           <div className="space-y-1.5">
@@ -107,9 +116,12 @@ const AddCategoryModal: React.FC<AddCategoryModalProps> = ({ isOpen, onClose, on
               type="datetime-local"
               error={errors.salesEndDate?.message}
               className="h-11 bg-white/[0.03] border-white/10 text-white text-[10px]"
-              {...register('salesEndDate', {
-                required: 'Closing required',
-                validate: value => !salesStartDate || value > salesStartDate || 'Timeline violation'
+              {...register("salesEndDate", {
+                required: "Closing required",
+                validate: (value) =>
+                  !salesStartDate ||
+                  value > salesStartDate ||
+                  "Timeline violation",
               })}
             />
           </div>
@@ -123,7 +135,7 @@ const AddCategoryModal: React.FC<AddCategoryModalProps> = ({ isOpen, onClose, on
           <textarea
             className="w-full h-24 bg-white/[0.03] border border-white/10 rounded-xl p-4 text-white text-xs leading-relaxed font-light italic focus:outline-none focus:ring-1 focus:ring-[#FF3333]/50 transition-all placeholder:text-white/10"
             placeholder="Specify access privileges and tier benefits..."
-            {...register('description')}
+            {...register("description")}
           />
         </div>
 

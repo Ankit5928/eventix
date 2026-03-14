@@ -1,14 +1,8 @@
 import { useState } from "react";
 import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../../components/ui/Card";
-import orderService from "../../service/orderService";
-import { Ticket, Search, Download, Mail } from "lucide-react";
+import { Card, CardContent } from "../../components/ui/Card";
+import { Ticket, Search, Mail } from "lucide-react";
 
 interface SimpleTicket {
   ticketCode: string;
@@ -33,13 +27,14 @@ export default function MyTicketsPage() {
     setSearched(true);
     try {
       // Use a generic GET call since the my-tickets endpoint might use email lookup
-      const { data } = await (await import("../../service/axiosConfig")).default.get(
-        "/tickets/my-tickets",
-        { params: { email } }
-      );
+      const { data } = await (
+        await import("../../service/axiosConfig")
+      ).default.get("/tickets/my-tickets", { params: { email } });
       setTickets(data || []);
     } catch (err: any) {
-      setError(err.response?.data?.message || "Could not find tickets for this email.");
+      setError(
+        err.response?.data?.message || "Could not find tickets for this email.",
+      );
       setTickets([]);
     } finally {
       setLoading(false);
@@ -98,17 +93,22 @@ export default function MyTicketsPage() {
               <CardContent className="pt-6">
                 <div className="flex items-start justify-between">
                   <div className="space-y-1">
-                    <h3 className="font-semibold text-lg">{ticket.eventName}</h3>
+                    <h3 className="font-semibold text-lg">
+                      {ticket.eventName}
+                    </h3>
                     <p className="text-sm text-muted-foreground">
                       {ticket.categoryName}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {new Date(ticket.eventDate).toLocaleDateString(undefined, {
-                        weekday: "long",
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
+                      {new Date(ticket.eventDate).toLocaleDateString(
+                        undefined,
+                        {
+                          weekday: "long",
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        },
+                      )}
                     </p>
                     <p className="text-xs font-mono text-muted-foreground">
                       Code: {ticket.ticketCode}

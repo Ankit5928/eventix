@@ -9,11 +9,9 @@ import {
   Type,
   AlignLeft,
   Globe,
-  Eye,
   Loader2,
   AlertCircle,
-  Save,
-  Clock
+  Clock,
 } from "lucide-react";
 
 // The missing interface that was causing the error
@@ -28,7 +26,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({
   open,
   event,
   onClose,
-  onUpdate
+  onUpdate,
 }) => {
   const [form, setForm] = useState<UpdateEventRequest>({
     title: "",
@@ -56,7 +54,11 @@ const EditEventModal: React.FC<EditEventModalProps> = ({
     }
   }, [event]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
@@ -179,7 +181,11 @@ const EditEventModal: React.FC<EditEventModalProps> = ({
             disabled={loading}
             className="h-11 px-8 rounded-xl font-black text-[10px] uppercase tracking-[0.3em] border-0 shadow-lg shadow-[#FF3333]/10"
           >
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Commit Changes"}
+            {loading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              "Commit Changes"
+            )}
           </Button>
         </div>
       </form>

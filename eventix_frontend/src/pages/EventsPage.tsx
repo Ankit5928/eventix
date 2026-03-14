@@ -15,8 +15,6 @@ import {
   Calendar as CalendarIcon,
   XCircle,
   CheckCircle2,
-  MoreVertical,
-  ArrowUpRight,
   Sparkles,
 } from "lucide-react";
 import AddEventModal from "../modal/AddEventModal";

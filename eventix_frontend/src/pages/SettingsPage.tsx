@@ -20,7 +20,6 @@ import {
   CreditCard,
   Building2,
   Loader2,
-  Crown,
   Key,
   Globe,
   Settings as SettingsIcon,
