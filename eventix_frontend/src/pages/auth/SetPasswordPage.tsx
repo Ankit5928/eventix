@@ -1,25 +1,39 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import apiClient from '../../service/api';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/Card';
-import { Input } from '../../components/ui/Input';
-import { Button } from '../../components/ui/Button';
-import { AlertCircle, CheckCircle2, ShieldCheck, Lock, Sparkles, Loader2, Key } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import apiClient from "../../service/api";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "../../components/ui/Card";
+import { Input } from "../../components/ui/Input";
+import { Button } from "../../components/ui/Button";
+import {
+  AlertCircle,
+  CheckCircle2,
+  ShieldCheck,
+  Lock,
+  Sparkles,
+  Loader2,
+  Key,
+} from "lucide-react";
 
 export default function SetPasswordPage() {
   const [searchParams] = useSearchParams();
-  const token = searchParams.get('token');
+  const token = searchParams.get("token");
   const navigate = useNavigate();
 
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMode, setSuccessMode] = useState(false);
 
   useEffect(() => {
     if (!token) {
-      navigate('/login');
+      navigate("/login");
     }
   }, [token, navigate]);
 
@@ -38,13 +52,15 @@ export default function SetPasswordPage() {
     setError(null);
 
     try {
-      await apiClient.post('/auth/set-password', {
+      await apiClient.post("/auth/set-password", {
         token,
-        newPassword
+        newPassword,
       });
       setSuccessMode(true);
     } catch (err: any) {
-      const errMsg = err.response?.data?.message || "Protocol Failure: Your authorization token is invalid.";
+      const errMsg =
+        err.response?.data?.message ||
+        "Protocol Failure: Your authorization token is invalid.";
       setError(typeof errMsg === "string" ? errMsg : "System error.");
     } finally {
       setIsLoading(false);
@@ -52,7 +68,7 @@ export default function SetPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-[#0A0000] relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-background relative overflow-hidden">
       {/* Background Decorative Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#FF3333]/5 blur-[120px] pointer-events-none" />
 
@@ -69,7 +85,9 @@ export default function SetPasswordPage() {
           <div className="space-y-1">
             <div className="flex items-center justify-center gap-2 text-[#FF3333]">
               <ShieldCheck className="w-3 h-3" />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em]">Security Node</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.4em]">
+                Security Node
+              </span>
             </div>
             <CardTitle className="text-3xl font-bold tracking-tighter italic text-white uppercase">
               {successMode ? "Access Granted" : "Initialize Key"}
@@ -90,7 +108,7 @@ export default function SetPasswordPage() {
               </div>
               <Button
                 variant="premium"
-                onClick={() => navigate('/login')}
+                onClick={() => navigate("/login")}
                 className="w-full h-12 rounded-xl font-black text-[10px] uppercase tracking-[0.3em] border-0"
               >
                 Proceed to Terminal
@@ -108,14 +126,15 @@ export default function SetPasswordPage() {
               <div className="space-y-4">
                 <div className="space-y-1.5">
                   <label className="text-[8px] font-black text-white/30 uppercase tracking-[0.4em] pl-1 flex items-center gap-2">
-                    <Key className="w-3 h-3 text-[#FF3333]" /> New Encryption Key
+                    <Key className="w-3 h-3 text-[#FF3333]" /> New Encryption
+                    Key
                   </label>
                   <Input
                     type="password"
                     placeholder="••••••••"
                     required
                     value={newPassword}
-                    onChange={e => setNewPassword(e.target.value)}
+                    onChange={(e) => setNewPassword(e.target.value)}
                     disabled={isLoading}
                     className="h-12 bg-white/[0.03] border-white/10 rounded-xl focus:border-[#FF3333]/50 text-white placeholder:text-white/10 text-xs font-bold tracking-widest"
                   />
@@ -123,14 +142,15 @@ export default function SetPasswordPage() {
 
                 <div className="space-y-1.5">
                   <label className="text-[8px] font-black text-white/30 uppercase tracking-[0.4em] pl-1 flex items-center gap-2">
-                    <ShieldCheck className="w-3 h-3 text-[#FF3333]" /> Confirm Key
+                    <ShieldCheck className="w-3 h-3 text-[#FF3333]" /> Confirm
+                    Key
                   </label>
                   <Input
                     type="password"
                     placeholder="••••••••"
                     required
                     value={confirmPassword}
-                    onChange={e => setConfirmPassword(e.target.value)}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                     disabled={isLoading}
                     className="h-12 bg-white/[0.03] border-white/10 rounded-xl focus:border-[#FF3333]/50 text-white placeholder:text-white/10 text-xs font-bold tracking-widest"
                   />
@@ -148,13 +168,15 @@ export default function SetPasswordPage() {
                     <Loader2 className="w-4 h-4 animate-spin" />
                     Authorizing...
                   </div>
-                ) : "Establish Credential"}
+                ) : (
+                  "Establish Credential"
+                )}
               </Button>
 
               <div className="text-center pt-4">
                 <button
                   type="button"
-                  onClick={() => navigate('/login')}
+                  onClick={() => navigate("/login")}
                   className="text-[9px] font-black uppercase tracking-[0.3em] text-white/10 hover:text-white transition-colors"
                 >
                   Return to Node

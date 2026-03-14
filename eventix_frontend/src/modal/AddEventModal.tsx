@@ -17,7 +17,7 @@ import {
   Loader2,
   Plus,
   Sparkles,
-  AlertCircle
+  AlertCircle,
 } from "lucide-react";
 
 interface AddEventModalProps {
@@ -36,7 +36,11 @@ const initialState: CreateEventRequest = {
   visibility: "PUBLIC",
 };
 
-const AddEventModal: React.FC<AddEventModalProps> = ({ open, onClose, onCreate }) => {
+const AddEventModal: React.FC<AddEventModalProps> = ({
+  open,
+  onClose,
+  onCreate,
+}) => {
   const [form, setForm] = useState<CreateEventRequest>(initialState);
   const [error, setError] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -46,7 +50,11 @@ const AddEventModal: React.FC<AddEventModalProps> = ({ open, onClose, onCreate }
   const { user } = useAppSelector((state) => state.auth);
   const orgId = user?.currentOrganizationId || 1;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
@@ -108,16 +116,25 @@ const AddEventModal: React.FC<AddEventModalProps> = ({ open, onClose, onCreate }
         {/* Image Dropzone Asset */}
         <div className="space-y-2">
           <label className="text-[8px] font-black text-white/30 uppercase tracking-[0.4em] pl-1 flex items-center gap-2">
-            <ImageIcon className="w-3 h-3 text-[#FF3333]" /> Visual Identity (Banner)
+            <ImageIcon className="w-3 h-3 text-[#FF3333]" /> Visual Identity
+            (Banner)
           </label>
           <div className="relative group cursor-pointer">
-            <div className={`w-full h-32 rounded-2xl border-2 border-dashed transition-all duration-500 flex flex-col items-center justify-center overflow-hidden bg-white/[0.02] ${imagePreview ? 'border-[#FF3333]/50' : 'border-white/10 hover:border-[#FF3333]/30'}`}>
+            <div
+              className={`w-full h-32 rounded-2xl border-2 border-dashed transition-all duration-500 flex flex-col items-center justify-center overflow-hidden bg-white/[0.02] ${imagePreview ? "border-[#FF3333]/50" : "border-white/10 hover:border-[#FF3333]/30"}`}
+            >
               {imagePreview ? (
-                <img src={imagePreview} alt="Preview" className="w-full h-full object-cover brightness-50 group-hover:brightness-75 transition-all" />
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  className="w-full h-full object-cover brightness-50 group-hover:brightness-75 transition-all"
+                />
               ) : (
                 <div className="flex flex-col items-center gap-2 opacity-20 group-hover:opacity-40 transition-opacity">
                   <Plus className="w-6 h-6 text-white" />
-                  <span className="text-[10px] font-black uppercase tracking-widest">Upload Asset</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest">
+                    Upload Asset
+                  </span>
                 </div>
               )}
               <input
@@ -149,7 +166,8 @@ const AddEventModal: React.FC<AddEventModalProps> = ({ open, onClose, onCreate }
           {/* Location & Timezone */}
           <div className="space-y-1.5">
             <label className="text-[8px] font-black text-white/30 uppercase tracking-[0.4em] pl-1 flex items-center gap-2">
-              <MapPin className="w-3 h-3 text-[#FF3333]" /> Deployment Coordinate
+              <MapPin className="w-3 h-3 text-[#FF3333]" /> Deployment
+              Coordinate
             </label>
             <Input
               name="location"
@@ -214,8 +232,12 @@ const AddEventModal: React.FC<AddEventModalProps> = ({ open, onClose, onCreate }
               onChange={handleChange}
               className="w-full h-11 bg-white/[0.03] border border-white/10 rounded-xl px-4 text-[10px] font-black tracking-[0.2em] text-white focus:ring-1 focus:ring-[#FF3333]/50 appearance-none cursor-pointer outline-none"
             >
-              <option value="PUBLIC" className="bg-[#0A0000]">PUBLIC (OPEN NODE)</option>
-              <option value="PRIVATE" className="bg-[#0A0000]">PRIVATE (ENCRYPTED)</option>
+              <option value="PUBLIC" className="bg-background/10">
+                PUBLIC (OPEN NODE)
+              </option>
+              <option value="PRIVATE" className="bg-background/10">
+                PRIVATE (ENCRYPTED)
+              </option>
             </select>
           </div>
 

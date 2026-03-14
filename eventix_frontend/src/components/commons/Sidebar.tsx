@@ -34,7 +34,9 @@ const Sidebar = () => {
             <h2 className="text-xl font-black tracking-tighter uppercase italic leading-none">
               Event<span className="text-[#FF3333]">ix</span>
             </h2>
-            <p className="text-[8px] tracking-[0.4em] text-white/30 uppercase font-black mt-1">Terminal v4.0</p>
+            <p className="text-[8px] tracking-[0.4em] text-white/30 uppercase font-black mt-1">
+              Terminal v4.0
+            </p>
           </div>
         </Link>
       </div>
@@ -49,14 +51,19 @@ const Sidebar = () => {
               to={item.path}
               className={`
                 flex items-center px-5 py-3.5 rounded-2xl transition-all duration-300 group
-                ${isActive
-                  ? "bg-white/[0.03] border border-white/10 text-white shadow-xl"
-                  : "text-white/40 hover:text-white hover:bg-white/[0.02]"
+                ${
+                  isActive
+                    ? "bg-white/[0.03] border border-white/10 text-white shadow-xl"
+                    : "text-white/40 hover:text-white hover:bg-white/[0.02]"
                 }
               `}
             >
-              <item.icon className={`w-5 h-5 mr-3 ${isActive ? "text-[#FF3333]" : "group-hover:text-[#FF3333]"}`} />
-              <span className="text-[11px] font-bold uppercase tracking-[0.2em]">{item.name}</span>
+              <item.icon
+                className={`w-5 h-5 mr-3 ${isActive ? "text-[#FF3333]" : "group-hover:text-[#FF3333]"}`}
+              />
+              <span className="text-[11px] font-bold uppercase tracking-[0.2em]">
+                {item.name}
+              </span>
 
               {isActive && (
                 <Sparkles className="ml-auto w-3 h-3 text-[#FF3333] animate-pulse" />
@@ -67,13 +74,15 @@ const Sidebar = () => {
       </nav>
 
       {/* Footer / Logout */}
-      <div className="p-6 border-t border-white/5 bg-black/20">
+      <div className="p-6 border-t border-white/5 bg-background/20">
         <button
           onClick={() => dispatch(logout())}
           className="flex items-center w-full px-5 py-3 text-white/20 hover:text-red-500 hover:bg-red-500/5 rounded-2xl transition-all duration-300 group"
         >
           <LogOut className="w-4 h-4 mr-3 group-hover:-translate-x-1 transition-transform" />
-          <span className="text-[9px] font-black uppercase tracking-[0.3em]">Logout Session</span>
+          <span className="text-[9px] font-black uppercase tracking-[0.3em]">
+            Logout Session
+          </span>
         </button>
       </div>
     </aside>

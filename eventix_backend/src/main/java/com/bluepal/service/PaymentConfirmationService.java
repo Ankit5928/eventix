@@ -89,8 +89,11 @@ public class PaymentConfirmationService {
             log.error("PDF generation failed for order {}: {}", order.getId(), e.getMessage());
         }
 
-        // 7. Send confirmation email
+        // 7. Send confirmation email (include ticket code + QR preview)
         try {
+            String ticketCode = tickets.isEmpty() ? "" : tickets.get(0).getTicketCode();
+            String qrPath = tickets.isEmpty() ? null : tickets.get(0).getQrCodePath();
+
             emailService.sendTicketEmail(
                     reservation.getAttendeeEmail(),
                     reservation.getAttendeeName(),
@@ -98,8 +101,9 @@ public class PaymentConfirmationService {
                     reservation.getEvent().getStartDate().toString(),
                     reservation.getEvent().getLocation(),
                     order.getPdfPath(),
-                    order.getId()
-            );
+                    order.getId(),
+                    ticketCode,
+                    qrPath);
         } catch (Exception e) {
             log.error("Email delivery failed for order {}: {}", order.getId(), e.getMessage());
         }
@@ -115,7 +119,8 @@ public class PaymentConfirmationService {
             for (int i = 0; i < resItem.getQuantity(); i++) {
                 UUID ticketId = UUID.randomUUID();
                 // Generate a 12-digit numeric ticket code
-                String ticketCode = String.format("%012d", java.util.concurrent.ThreadLocalRandom.current().nextLong(100000000000L, 1000000000000L));
+                String ticketCode = String.format("%012d",
+                        java.util.concurrent.ThreadLocalRandom.current().nextLong(100000000000L, 1000000000000L));
 
                 String qrPath = qrCodeService.generateQRCode(ticketId, ticketCode);
 

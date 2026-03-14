@@ -9,6 +9,7 @@ import com.bluepal.repository.OrderRepository;
 import com.bluepal.repository.TicketCategoryRepository;
 import com.bluepal.repository.TicketRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ReportingService {
 
     private final OrderRepository orderRepository;
@@ -32,16 +34,16 @@ public class ReportingService {
     public List<RevenueReportDTO> getRevenueByEvent(Long orgId, LocalDateTime start, LocalDateTime end) {
         LocalDateTime actualStart = (start != null) ? start : LocalDateTime.of(2000, 1, 1, 0, 0);
         LocalDateTime actualEnd = (end != null) ? end : LocalDateTime.of(2100, 1, 1, 0, 0);
-        
+
         List<RevenueReportDTO> reports = orderRepository.getRevenueReportByOrganization(orgId, actualStart, actualEnd);
 
         reports.forEach(report -> {
             double total = report.getTotalRevenue() != null ? report.getTotalRevenue() : 0.0;
             long sold = report.getTicketsSold() != null ? report.getTicketsSold() : 0L;
-            
+
             report.setTotalRevenue(total);
             report.setTicketsSold(sold);
-            
+
             if (sold > 0) {
                 report.setAvgTicketPrice(total / sold);
             } else {
@@ -53,7 +55,8 @@ public class ReportingService {
     }
 
     // Add to ReportingService.java
-    public List<SalesTimeSeriesDTO> getSalesOverTime(Long eventId, String groupBy, LocalDateTime start, LocalDateTime end) {
+    public List<SalesTimeSeriesDTO> getSalesOverTime(Long eventId, String groupBy, LocalDateTime start,
+            LocalDateTime end) {
         // T8: Default to last 30 days if null
         LocalDateTime actualStart = (start != null) ? start : LocalDateTime.now().minusDays(30);
         LocalDateTime actualEnd = (end != null) ? end : LocalDateTime.now();
@@ -68,8 +71,7 @@ public class ReportingService {
                 .ordersCount(((Number) row[1]).longValue())
                 .ticketsSold(((Number) row[2]).longValue())
                 .revenue(((Number) row[3]).doubleValue())
-                .build()
-        ).toList();
+                .build()).toList();
     }
 
     // Add to ReportingService.java
@@ -137,6 +139,12 @@ public class ReportingService {
                         .ticketsSold(ticketRepository.countByEventId(e.getId()))
                         .build())
                 .toList();
+
+        // NOTE: This debug log is intentionally verbose to help diagnose why
+        // organizations may return zeroed stats.
+        log.debug(
+                "Computed OrganizationSummary for orgId={}: revenue={}, totalEvents={}, activeEvents={}, totalTickets={}",
+                orgId, revenue, totalEvents, activeEvents, totalTickets);
 
         return OrganizationSummaryDTO.builder()
                 .totalRevenue(revenue != null ? revenue : 0.0)

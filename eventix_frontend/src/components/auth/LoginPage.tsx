@@ -2,15 +2,17 @@ import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { setCredentials } from "../../store/slices/authSlice";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardFooter,
-} from "../ui/Card";
+import { Card, CardContent, CardHeader, CardFooter } from "../ui/Card";
 import { Input } from "../ui/Input";
 import { Button } from "../ui/Button";
-import { AlertCircle, Shield, Mail, Lock, ChevronRight, Sparkles } from "lucide-react";
+import {
+  AlertCircle,
+  Shield,
+  Mail,
+  Lock,
+  ChevronRight,
+  Sparkles,
+} from "lucide-react";
 import apiClient from "../../service/api";
 
 export default function LoginPage() {
@@ -43,29 +45,56 @@ export default function LoginPage() {
             id: String(userId),
             email: email,
             roles: role ? [role] : [],
-            currentOrganizationId: 0,
+            currentOrganizationId:
+              organizationIds && organizationIds.length > 0
+                ? organizationIds[0]
+                : 0,
           },
           organizationIds: organizationIds ? organizationIds.map(String) : [],
         }),
       );
       navigate("/dashboard");
     } catch (err: any) {
-      const errMsg = err.response?.data?.message || err.response?.data || "Invalid credentials.";
-      setError(typeof errMsg === "string" ? errMsg : "An unexpected error occurred.");
+      const errMsg =
+        err.response?.data?.message ||
+        err.response?.data ||
+        "Invalid credentials.";
+      setError(
+        typeof errMsg === "string" ? errMsg : "An unexpected error occurred.",
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
   const eventImages = [
-    { src: "https://images.unsplash.com/photo-1682632618859-47904338bea1?q=80&w=1170&auto=format&fit=crop", title: "Global Summit", cat: "Elite" },
-    { src: "https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?q=80&w=1170&auto=format&fit=crop", title: "Concours d'Elegance", cat: "Luxury" },
-    { src: "https://images.unsplash.com/photo-1765510103179-0c2f628d2ff2?q=80&w=1172&auto=format&fit=crop", title: "Opera Gala", cat: "Arts" },
-    { src: "https://images.unsplash.com/photo-1708569176850-9de9aa6b179b?q=80&w=1170&auto=format&fit=crop", title: "Royal Wedding", cat: "Private" },
+    {
+      src: "https://images.unsplash.com/photo-1682632618859-47904338bea1?q=80&w=1170&auto=format&fit=crop",
+      title: "Global Summit",
+      cat: "Elite",
+    },
+    {
+      src: "https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?q=80&w=1170&auto=format&fit=crop",
+      title: "Concours d'Elegance",
+      cat: "Luxury",
+    },
+    {
+      src: "https://images.unsplash.com/photo-1765510103179-0c2f628d2ff2?q=80&w=1172&auto=format&fit=crop",
+      title: "Opera Gala",
+      cat: "Arts",
+    },
+    {
+      src: "https://images.unsplash.com/photo-1708569176850-9de9aa6b179b?q=80&w=1170&auto=format&fit=crop",
+      title: "Royal Wedding",
+      cat: "Private",
+    },
   ];
 
   return (
-    <div className={`h-screen w-screen flex flex-col lg:flex-row overflow-hidden bg-black ${mounted ? 'opacity-100' : 'opacity-0'} transition-opacity duration-1000`} style={{ fontFamily: "'Playfair Display', serif" }}>
+    <div
+      className={`h-screen w-screen flex flex-col lg:flex-row overflow-hidden bg-background ${mounted ? "opacity-100" : "opacity-0"} transition-opacity duration-1000`}
+      style={{ fontFamily: "'Playfair Display', serif" }}
+    >
       <div className="smoke-overlay" />
 
       {/* Left Side: Cinematic Narrative */}
@@ -78,11 +107,17 @@ export default function LoginPage() {
           {/* Branding */}
           <div className="flex items-center gap-4 animate-fade-in-up">
             <div className="w-12 h-12 bg-gradient-to-br from-[#FF0000] to-[#4D0000] rounded-xl flex items-center justify-center shadow-2xl shadow-red-600/30">
-              <span className="text-2xl font-bold text-white tracking-tighter italic">E</span>
+              <span className="text-2xl font-bold text-white tracking-tighter italic">
+                E
+              </span>
             </div>
             <div>
-              <h2 className="text-2xl font-black tracking-tighter text-white uppercase italic">Event<span className="text-[#FF0000]">ix</span></h2>
-              <p className="text-[10px] tracking-[0.4em] text-white/40 uppercase font-bold">International Consortium</p>
+              <h2 className="text-2xl font-black tracking-tighter text-white uppercase italic">
+                Event<span className="text-[#FF0000]">ix</span>
+              </h2>
+              <p className="text-[10px] tracking-[0.4em] text-white/40 uppercase font-bold">
+                International Consortium
+              </p>
             </div>
           </div>
 
@@ -90,24 +125,40 @@ export default function LoginPage() {
           <div className="max-w-xl space-y-6">
             <div className="flex items-center gap-2 text-[#D4AF37]">
               <Sparkles className="h-4 w-4" />
-              <span className="text-xs font-bold uppercase tracking-[0.3em]">Access Granted to the Elite</span>
+              <span className="text-xs font-bold uppercase tracking-[0.3em]">
+                Access Granted to the Elite
+              </span>
             </div>
             <h1 className="text-6xl xl:text-7xl font-bold text-[#1a2f1a] tracking-tighter leading-[0.9] italic">
-              Curating <span className="premium-gradient-text">World Class</span> Narratives.
+              Curating{" "}
+              <span className="premium-gradient-text">World Class</span>{" "}
+              Narratives.
             </h1>
             <p className="text-[#1a2f1a]/50 text-lg font-light leading-relaxed max-w-md italic">
-              The global terminal for high-stakes organizers. Manage legendary experiences with unparalleled precision.
+              The global terminal for high-stakes organizers. Manage legendary
+              experiences with unparalleled precision.
             </p>
           </div>
 
           {/* Mini Portfolio Preview */}
           <div className="grid grid-cols-4 gap-4">
             {eventImages.map((img, i) => (
-              <div key={i} className="group relative h-32 rounded-xl overflow-hidden border border-white/20 transition-all hover:scale-105 hover:border-[#FF0000]/50">
-                <img src={img.src} alt={img.title} className="w-full h-full object-cover brightness-50 group-hover:brightness-100 transition-all" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <p className="text-[8px] text-[#FF0000] font-bold uppercase tracking-widest">{img.cat}</p>
-                  <p className="text-[10px] text-white font-bold leading-tight">{img.title}</p>
+              <div
+                key={i}
+                className="group relative h-32 rounded-xl overflow-hidden border border-white/20 transition-all hover:scale-105 hover:border-[#FF0000]/50"
+              >
+                <img
+                  src={img.src}
+                  alt={img.title}
+                  className="w-full h-full object-cover brightness-50 group-hover:brightness-100 transition-all"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent flex flex-col justify-end p-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <p className="text-[8px] text-[#FF0000] font-bold uppercase tracking-widest">
+                    {img.cat}
+                  </p>
+                  <p className="text-[10px] text-white font-bold leading-tight">
+                    {img.title}
+                  </p>
                 </div>
               </div>
             ))}
@@ -116,11 +167,19 @@ export default function LoginPage() {
       </div>
 
       {/* Right Side: Luxury Authentication Terminal */}
-      <div className="flex-1 flex items-center justify-center p-6 bg-gradient-to-b from-black to-[#1a0000] relative">
+      <div className="flex-1 flex items-center justify-center p-6 bg-gradient-to-b from-background to-[#1a0000] relative">
         {/* Subtle Grid Background */}
-        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: `radial-gradient(#FF0000 0.5px, transparent 0.5px)`, backgroundSize: '24px 24px' }}></div>
+        <div
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: `radial-gradient(#FF0000 0.5px, transparent 0.5px)`,
+            backgroundSize: "24px 24px",
+          }}
+        ></div>
 
-        <Card className={`w-full max-w-[420px] bg-[#050505]/80 backdrop-blur-3xl border border-white/5 shadow-[0_50px_100px_-20px_rgba(0,0,0,1)] relative overflow-hidden transition-all duration-1000 delay-500 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'}`}>
+        <Card
+          className={`w-full max-w-[420px] bg-[#050505]/80 backdrop-blur-3xl border border-white/5 shadow-[0_50px_100px_-20px_rgba(0,0,0,1)] relative overflow-hidden transition-all duration-1000 delay-500 ${mounted ? "translate-y-0 opacity-100" : "translate-y-20 opacity-0"}`}
+        >
           {/* Top Accent Line */}
           <div className="h-0.5 w-full bg-gradient-to-r from-transparent via-[#FF0000] to-transparent opacity-50" />
 
@@ -130,8 +189,12 @@ export default function LoginPage() {
               <div className="absolute inset-0 rounded-full border border-[#FF0000]/20 animate-ping opacity-20" />
             </div>
             <div className="space-y-2">
-              <h2 className="text-3xl font-bold tracking-tighter text-white uppercase italic">Terminal Login</h2>
-              <p className="text-white/40 text-xs font-bold uppercase tracking-[0.2em]">Authorized Personnel Only</p>
+              <h2 className="text-3xl font-bold tracking-tighter text-white uppercase italic">
+                Terminal Login
+              </h2>
+              <p className="text-white/40 text-xs font-bold uppercase tracking-[0.2em]">
+                Authorized Personnel Only
+              </p>
             </div>
           </CardHeader>
 
@@ -144,7 +207,9 @@ export default function LoginPage() {
               )}
 
               <div className="space-y-1.5">
-                <label className="text-[9px] font-black text-white/30 uppercase tracking-[0.3em] pl-1">Encryption Key (Email)</label>
+                <label className="text-[9px] font-black text-white/30 uppercase tracking-[0.3em] pl-1">
+                  Encryption Key (Email)
+                </label>
                 <div className="relative group">
                   <Input
                     type="email"
@@ -160,7 +225,9 @@ export default function LoginPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[9px] font-black text-white/30 uppercase tracking-[0.3em] pl-1">Passcode</label>
+                <label className="text-[9px] font-black text-white/30 uppercase tracking-[0.3em] pl-1">
+                  Passcode
+                </label>
                 <div className="relative group">
                   <Input
                     type="password"
@@ -183,7 +250,9 @@ export default function LoginPage() {
                 {isLoading ? (
                   <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
                 ) : (
-                  <>Establish Connection <ChevronRight className="h-4 w-4" /></>
+                  <>
+                    Establish Connection <ChevronRight className="h-4 w-4" />
+                  </>
                 )}
               </Button>
             </form>
@@ -193,11 +262,23 @@ export default function LoginPage() {
             <div className="w-full h-px bg-white/5" />
             <div className="flex flex-col items-center gap-4">
               <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest">
-                New Strategist? <Link to="/register" className="text-[#FF0000] hover:text-white transition-colors">Request Access</Link>
+                New Strategist?{" "}
+                <Link
+                  to="/register"
+                  className="text-[#FF0000] hover:text-white transition-colors"
+                >
+                  Request Access
+                </Link>
               </p>
               <div className="flex gap-6">
-                {['Privacy', 'Protocol', 'Terms'].map((item) => (
-                  <Link key={item} to="#" className="text-[9px] text-white/20 hover:text-white transition-colors uppercase font-bold tracking-[0.2em]">{item}</Link>
+                {["Privacy", "Protocol", "Terms"].map((item) => (
+                  <Link
+                    key={item}
+                    to="#"
+                    className="text-[9px] text-white/20 hover:text-white transition-colors uppercase font-bold tracking-[0.2em]"
+                  >
+                    {item}
+                  </Link>
                 ))}
               </div>
             </div>

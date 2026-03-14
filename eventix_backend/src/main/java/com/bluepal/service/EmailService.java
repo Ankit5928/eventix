@@ -19,8 +19,6 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 // Core Spring & I/O for Attachments
 import org.springframework.core.io.ByteArrayResource;
 
-
-
 import java.io.File;
 import java.util.UUID;
 
@@ -34,10 +32,10 @@ public class EmailService {
     private final CalendarService calendarService;
     private final SpringTemplateEngine templateEngine;
 
-
     @Async // T20: Asynchronous processing
     public void sendTicketEmail(String toEmail, String attendeeName, String eventTitle,
-                                String eventDate, String location, String pdfPath, UUID orderId) {
+            String eventDate, String location, String pdfPath, UUID orderId,
+            String ticketCode, String qrPath) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -51,9 +49,18 @@ public class EmailService {
                     .replace("[Attendee Name]", attendeeName)
                     .replace("[Order ID]", orderId.toString())
                     .replace("[Event Date]", eventDate)
-                    .replace("[Location]", location);
+                    .replace("[Location]", location)
+                    .replace("[Ticket Code]", ticketCode != null ? ticketCode : "N/A");
 
             helper.setText(htmlContent, true);
+
+            // Inline QR code (preview) if it exists
+            if (qrPath != null && !qrPath.isBlank()) {
+                File qrFile = new File(qrPath);
+                if (qrFile.exists()) {
+                    helper.addInline("ticketQrCode", new FileSystemResource(qrFile));
+                }
+            }
 
             // T17: Attach the PDF from the path saved by FileStorageService
             File file = new File(pdfPath);
@@ -85,13 +92,11 @@ public class EmailService {
                 attendeeEmail,
                 "Resent: Your Tickets for " + eventTitle,
                 "Hello " + attendeeName + ",\n\nThis is a resend of your ticket email as requested.",
-                pdfPath
-        );
+                pdfPath);
 
         // T5: Log for audit
         log.info("Ticket email resent for Order ID: {} to {}", orderId, attendeeEmail);
     }
-
 
     // Inside EmailService.java
     public void sendPublicConfirmationEmail(Order order) {
@@ -116,7 +121,6 @@ public class EmailService {
             helper.addAttachment("event.ics", new ByteArrayResource(icsContent.getBytes()));
         });
     }
-
 
     private void sendEmailWithAttachment(String to, String subject, String body, String attachmentPath) {
         try {
@@ -147,9 +151,6 @@ public class EmailService {
         }
     }
 
-
-
-
     /**
      * Your provided HTML Template (EM-TICKET-GEN-004-T31)
      */
@@ -166,6 +167,15 @@ public class EmailService {
                 "        <strong>Date:</strong> [Event Date]<br>" +
                 "        <strong>Venue:</strong> [Location]" +
                 "    </div>" +
+                "    <div style=\"margin-top: 20px; padding: 15px; border-radius: 5px; background: #fff; border: 1px solid #e0e0e0;\">"
+                +
+                "        <p style=\"margin: 0 0 8px 0; font-weight: 700;\">Ticket Code</p>" +
+                "        <p style=\"margin: 0 0 10px 0; font-size: 18px; letter-spacing: 1px;\"><strong>[Ticket Code]</strong></p>"
+                +
+                "        <p style=\"margin: 0 0 10px 0;\">Scan this QR on arrival:</p>" +
+                "        <img src=\"cid:ticketQrCode\" alt=\"Ticket QR Code\" style=\"width: 240px; height: 240px;\" />"
+                +
+                "    </div>" +
                 "    <p>Please present the QR code on the PDF at the entrance.</p>" +
                 "    <p>See you there!<br>The Eventix Team</p>" +
                 "</div>" +
@@ -176,34 +186,37 @@ public class EmailService {
     @Async
     public void sendInviteEmail(String toEmail, String token, String orgName, String inviterEmail) {
         log.info("Sending invite email to {} for organization {}", toEmail, orgName);
-        
+
         try {
             Context context = new Context();
             context.setVariable("orgName", orgName);
             context.setVariable("inviterEmail", inviterEmail);
-            
+
             // Build the frontend Set-Password URL
             String setPasswordUrl = "http://localhost:5173/set-password?token=" + token;
             context.setVariable("inviteLink", setPasswordUrl);
-            
+
             String process = templateEngine.process("invite-email", context);
-            
+
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-            
+
             helper.setTo(toEmail);
             helper.setSubject("You've been invited to join " + orgName + " on Eventix!");
             helper.setText(process, true); // true = HTML
-            
-            // For now, only log if mail fails since they might not have real credentials yet
+
+            // For now, only log if mail fails since they might not have real credentials
+            // yet
             try {
                 mailSender.send(mimeMessage);
                 log.info("Email sent successfully to {}", toEmail);
             } catch (Exception e) {
-                log.warn("Failed to actually send email via SMTP. If testing locally without real credentials, here is the link: {}", setPasswordUrl);
+                log.warn(
+                        "Failed to actually send email via SMTP. If testing locally without real credentials, here is the link: {}",
+                        setPasswordUrl);
                 log.error("Mail Error:", e);
             }
-            
+
         } catch (MessagingException e) {
             log.error("Failed to generate HTML email for {}", toEmail, e);
         }

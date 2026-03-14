@@ -186,7 +186,6 @@
 //   );
 // }
 
-
 import { useState, useEffect } from "react";
 import {
   Card,
@@ -198,7 +197,14 @@ import {
 import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
 import { Link } from "react-router-dom";
-import { Search, MapPin, Calendar as CalendarIcon, Clock, Award, Sparkles } from "lucide-react";
+import {
+  Search,
+  MapPin,
+  Calendar as CalendarIcon,
+  Clock,
+  Award,
+  Sparkles,
+} from "lucide-react";
 import publicService from "../../service/publicService";
 
 interface EventSummary {
@@ -235,7 +241,9 @@ export default function EventListingPage() {
   }, []);
 
   const filteredEvents = events.filter((e) => {
-    const matchesSearch = e.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = e.title
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
     const eventDate = new Date(e.startDate);
     const matchesFrom = !dateFrom || eventDate >= new Date(dateFrom);
     const matchesTo = !dateTo || eventDate <= new Date(dateTo + "T23:59:59");
@@ -255,11 +263,15 @@ export default function EventListingPage() {
         <section className="pt-28 pb-16 px-4">
           <div className="container mx-auto text-center max-w-4xl">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[#FF3333] text-[10px] font-bold mb-6 uppercase tracking-[0.3em] backdrop-blur-md">
-              <Sparkles className="h-3 w-3 animate-pulse" /> Curated Elite Access
+              <Sparkles className="h-3 w-3 animate-pulse" /> Curated Elite
+              Access
             </div>
 
             <h1 className="premium-title mb-8 leading-tight">
-              Embark on Your Next <span className="premium-gradient-text">Legendary Experience</span>
+              Embark on Your Next{" "}
+              <span className="premium-gradient-text">
+                Legendary Experience
+              </span>
             </h1>
 
             <div className="relative max-w-2xl mx-auto group">
@@ -278,13 +290,19 @@ export default function EventListingPage() {
         <section className="container mx-auto px-6 py-12">
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 mb-12 border-b border-white/5 pb-10">
             <div>
-              <h2 className="text-3xl font-bold tracking-tighter text-white">Upcoming Portfolio</h2>
-              <p className="text-white/40 text-sm font-light mt-1 uppercase tracking-widest">Global Reservation Terminal</p>
+              <h2 className="text-3xl font-bold tracking-tighter text-white">
+                Upcoming Portfolio
+              </h2>
+              <p className="text-white/40 text-sm font-light mt-1 uppercase tracking-widest">
+                Global Reservation Terminal
+              </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-4">
               <div className="flex items-center gap-3 bg-white/5 p-2 rounded-xl border border-white/10 backdrop-blur-sm">
-                <span className="text-[10px] font-bold text-white/30 uppercase pl-2">Period</span>
+                <span className="text-[10px] font-bold text-white/30 uppercase pl-2">
+                  Period
+                </span>
                 <input
                   type="date"
                   value={dateFrom}
@@ -300,7 +318,10 @@ export default function EventListingPage() {
                 />
                 {(dateFrom || dateTo) && (
                   <button
-                    onClick={() => { setDateFrom(""); setDateTo(""); }}
+                    onClick={() => {
+                      setDateFrom("");
+                      setDateTo("");
+                    }}
                     className="text-[10px] font-black text-[#FF3333] uppercase hover:text-white transition-colors pr-2 pl-2"
                   >
                     Reset
@@ -313,14 +334,21 @@ export default function EventListingPage() {
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
               {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
-                <div key={i} className="premium-card h-[400px] animate-pulse overflow-hidden bg-white/5 border-white/5" />
+                <div
+                  key={i}
+                  className="premium-card h-[400px] animate-pulse overflow-hidden bg-white/5 border-white/5"
+                />
               ))}
             </div>
           ) : filteredEvents.length === 0 ? (
             <div className="text-center py-32 premium-card border-dashed bg-white/[0.01] border-white/10">
               <CalendarIcon className="mx-auto h-20 w-20 text-[#FF3333] mb-6 opacity-10" />
-              <h3 className="text-2xl font-bold mb-2 text-white/80">No Experiences Found</h3>
-              <p className="text-white/30 text-sm font-light italic">Refine your search criteria for exclusive access.</p>
+              <h3 className="text-2xl font-bold mb-2 text-white/80">
+                No Experiences Found
+              </h3>
+              <p className="text-white/30 text-sm font-light italic">
+                Refine your search criteria for exclusive access.
+              </p>
             </div>
           ) : (
             /* THE 5-COLUMN GRID */
@@ -331,7 +359,7 @@ export default function EventListingPage() {
                   className="premium-card group border-0 overflow-hidden flex flex-col bg-white shadow-2xl hover:shadow-[#FF3333]/10 transition-all duration-500"
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
-                  <div className="aspect-[4/5] relative overflow-hidden bg-[#0A0000]">
+                  <div className="aspect-[4/5] relative overflow-hidden bg-background/10">
                     {event.imageUrl ? (
                       <img
                         src={event.imageUrl}
@@ -339,13 +367,13 @@ export default function EventListingPage() {
                         className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-1000 brightness-90 group-hover:brightness-105"
                       />
                     ) : (
-                      <div className="absolute inset-0 bg-gradient-to-br from-[#1A0000] to-[#0A0000] flex items-center justify-center">
+                      <div className="absolute inset-0 bg-gradient-to-br from-background/20 to-background/10 flex items-center justify-center">
                         <Award className="h-12 w-12 text-[#FF3333]/10" />
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                    <div className="absolute top-3 right-3 bg-black/40 backdrop-blur-md border border-white/10 text-white text-[10px] font-black px-3 py-1.5 rounded-full shadow-xl">
+                    <div className="absolute top-3 right-3 bg-background/40 backdrop-blur-md border border-white/10 text-white text-[10px] font-black px-3 py-1.5 rounded-full shadow-xl">
                       ${event.minPrice}+
                     </div>
                   </div>
@@ -370,7 +398,10 @@ export default function EventListingPage() {
                           <Clock className="h-3 w-3 text-[#FF3333]" />
                         </div>
                         <span>
-                          {new Date(event.startDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          {new Date(event.startDate).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -383,7 +414,11 @@ export default function EventListingPage() {
                   </CardContent>
 
                   <CardFooter className="px-5 pb-5 pt-0">
-                    <Button variant="premium" className="w-full h-10 text-[10px] font-black uppercase tracking-[0.2em] rounded-xl" asChild>
+                    <Button
+                      variant="premium"
+                      className="w-full h-10 text-[10px] font-black uppercase tracking-[0.2em] rounded-xl"
+                      asChild
+                    >
                       <Link to={`/event/${event.id}`}>Secure Entry</Link>
                     </Button>
                   </CardFooter>

@@ -25,7 +25,8 @@ public class OrganizationController {
      * EM-AUTH-004-T7: Restricted to OWNER or SYSTEM_ADMIN roles.
      */
     @GetMapping("/{orgId}")
-    @PreAuthorize("hasRole('OWNER') or hasRole('SYSTEM_ADMIN')")
+    // ORGANIZERs should be able to view their own organization details as well.
+    @PreAuthorize("hasRole('OWNER') or hasRole('SYSTEM_ADMIN') or hasRole('ORGANIZER')")
     public ResponseEntity<OrganizationResponse> getOrganization(
             @PathVariable Long orgId) throws AccessDeniedException {
 

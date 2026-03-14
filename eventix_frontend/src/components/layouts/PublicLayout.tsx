@@ -1,23 +1,21 @@
-
-import { Outlet, Link } from 'react-router-dom';
-import { useAppSelector } from '../../store';
-import { RootState } from '../../store';
-import { Button } from '../ui/Button';
-import Footer from './footer';
-import { Ticket, User, LayoutDashboard, Sparkles } from 'lucide-react';
+import { Outlet, Link } from "react-router-dom";
+import { useAppSelector } from "../../store";
+import { RootState } from "../../store";
+import { Button } from "../ui/Button";
+import Footer from "./footer";
+import { Ticket, User, LayoutDashboard, Sparkles } from "lucide-react";
 
 export default function PublicLayout() {
   const { isAuthenticated } = useAppSelector((state: RootState) => state.auth);
 
   return (
-    <div className="premium-page-container min-h-screen flex flex-col bg-[#0A0000]">
+    <div className="premium-page-container min-h-screen flex flex-col bg-background">
       {/* Background depth for the layout level */}
       <div className="premium-bg-overlay opacity-30" />
 
       {/* Premium Floating Header */}
       <header className="fixed top-0 left-0 right-0 z-50 px-4 py-4 md:px-10">
         <div className="container mx-auto h-16 flex items-center justify-between px-6 bg-white/[0.03] backdrop-blur-2xl border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition-all">
-
           {/* Brand Logo */}
           <Link to="/" className="flex items-center gap-3 group">
             <div className="relative">
@@ -44,7 +42,12 @@ export default function PublicLayout() {
             <div className="h-4 w-px bg-white/10 hidden md:block" />
 
             {isAuthenticated ? (
-              <Button variant="premium" size="sm" asChild className="rounded-full px-6 h-9 text-[10px] tracking-widest">
+              <Button
+                variant="premium"
+                size="sm"
+                asChild
+                className="rounded-full px-6 h-9 text-[10px] tracking-widest"
+              >
                 <Link to="/dashboard" className="flex items-center gap-2">
                   <LayoutDashboard className="w-3 h-3" />
                   Terminal
@@ -58,7 +61,12 @@ export default function PublicLayout() {
                 >
                   Sign In
                 </Link>
-                <Button variant="premium" size="sm" asChild className="rounded-full px-6 h-9 text-[10px] tracking-widest">
+                <Button
+                  variant="premium"
+                  size="sm"
+                  asChild
+                  className="rounded-full px-6 h-9 text-[10px] tracking-widest"
+                >
                   <Link to="/register" className="flex items-center gap-2">
                     <User className="w-3 h-3" />
                     Join

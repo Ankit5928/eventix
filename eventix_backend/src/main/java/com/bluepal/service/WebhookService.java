@@ -81,7 +81,8 @@ public class WebhookService {
                 });
 
         // 3. EM-PAY-005: Delegate Order Creation to OrderService (T26)
-        // This method handles idempotency, snapshots, and updating reservation status to CONFIRMED
+        // This method handles idempotency, snapshots, and updating reservation status
+        // to CONFIRMED
         OrderResponse orderResponse = orderService.createOrder(payment.getId());
 
         // 4. Fetch the Order Entity to attach Tickets and PDF
@@ -98,6 +99,9 @@ public class WebhookService {
 
         // 7. EM-TICKET-GEN-004: Async Email Delivery
         try {
+            String ticketCode = generatedTickets.isEmpty() ? "" : generatedTickets.get(0).getTicketCode();
+            String qrPath = generatedTickets.isEmpty() ? null : generatedTickets.get(0).getQrCodePath();
+
             emailService.sendTicketEmail(
                     order.getReservation().getAttendeeEmail(),
                     order.getReservation().getAttendeeName(),
@@ -105,8 +109,9 @@ public class WebhookService {
                     order.getReservation().getEvent().getStartDate().toString(),
                     order.getReservation().getEvent().getLocation(),
                     pdfPath,
-                    order.getId()
-            );
+                    order.getId(),
+                    ticketCode,
+                    qrPath);
         } catch (Exception e) {
             log.error("Order fulfilled but email delivery failed: {}", e.getMessage());
         }
@@ -121,7 +126,8 @@ public class WebhookService {
             for (int i = 0; i < resItem.getQuantity(); i++) {
                 UUID ticketId = UUID.randomUUID();
                 // Generate a 12-digit numeric ticket code
-                String ticketCode = String.format("%012d", java.util.concurrent.ThreadLocalRandom.current().nextLong(100000000000L, 1000000000000L));
+                String ticketCode = String.format("%012d",
+                        java.util.concurrent.ThreadLocalRandom.current().nextLong(100000000000L, 1000000000000L));
 
                 // T10: Save QR code file
                 String qrPath = qrCodeService.generateQRCode(ticketId, ticketCode);

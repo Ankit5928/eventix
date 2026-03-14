@@ -22,6 +22,12 @@ export interface EventSummaryDTO {
 export interface OrganizationSummaryDTO {
   totalEvents: number;
   totalRevenue: number;
-  totalAttendees: number;
-  activeEventsCount: number;
+  totalTicketsSold: number;
+  activeEvents: number;
+  upcomingEvents?: {
+    eventId: number;
+    title: string;
+    startDate: string;
+    ticketsSold: number;
+  }[];
 }

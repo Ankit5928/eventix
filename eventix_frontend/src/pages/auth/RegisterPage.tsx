@@ -66,14 +66,29 @@ const RegisterPage = () => {
   };
 
   const showcaseImages = [
-    { src: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=1170&auto=format&fit=crop", cat: "Summits" },
-    { src: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=1169&auto=format&fit=crop", cat: "Galas" },
-    { src: "https://images.unsplash.com/photo-1469371670807-013ccf25f16a?q=80&w=1170&auto=format&fit=crop", cat: "Elite" },
-    { src: "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=1170&auto=format&fit=crop", cat: "VIP" },
+    {
+      src: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=1170&auto=format&fit=crop",
+      cat: "Summits",
+    },
+    {
+      src: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=1169&auto=format&fit=crop",
+      cat: "Galas",
+    },
+    {
+      src: "https://images.unsplash.com/photo-1469371670807-013ccf25f16a?q=80&w=1170&auto=format&fit=crop",
+      cat: "Elite",
+    },
+    {
+      src: "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=1170&auto=format&fit=crop",
+      cat: "VIP",
+    },
   ];
 
   return (
-    <div className={`h-screen w-screen flex flex-col lg:flex-row overflow-hidden bg-black ${mounted ? 'opacity-100' : 'opacity-0'} transition-opacity duration-1000`} style={{ fontFamily: "'Playfair Display', serif" }}>
+    <div
+      className={`h-screen w-screen flex flex-col lg:flex-row overflow-hidden bg-background ${mounted ? "opacity-100" : "opacity-0"} transition-opacity duration-1000`}
+      style={{ fontFamily: "'Playfair Display', serif" }}
+    >
       <div className="smoke-overlay" />
       {/* Left Side: Cinematic Narrative */}
       <div className="lg:w-[60%] relative hidden lg:block overflow-hidden border-r border-white/5">
@@ -86,15 +101,21 @@ const RegisterPage = () => {
               <Ticket className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-black tracking-tighter text-white uppercase italic">Event<span className="text-[#FF0000]">ix</span></h2>
-              <p className="text-[10px] tracking-[0.4em] text-white/40 uppercase font-bold">Consortium Protocol</p>
+              <h2 className="text-2xl font-black tracking-tighter text-white uppercase italic">
+                Event<span className="text-[#FF0000]">ix</span>
+              </h2>
+              <p className="text-[10px] tracking-[0.4em] text-white/40 uppercase font-bold">
+                Consortium Protocol
+              </p>
             </div>
           </div>
 
           <div className="max-w-xl space-y-6">
             <div className="flex items-center gap-2 text-[#FF0000]">
               <Crown className="h-4 w-4" />
-              <span className="text-xs font-bold uppercase tracking-[0.3em]">Founding Partner Program</span>
+              <span className="text-xs font-bold uppercase tracking-[0.3em]">
+                Founding Partner Program
+              </span>
             </div>
             <h1 className="text-6xl xl:text-8xl font-bold text-white tracking-tighter leading-[0.85] italic">
               Establish Your <br />
@@ -107,8 +128,15 @@ const RegisterPage = () => {
 
           <div className="grid grid-cols-4 gap-4">
             {showcaseImages.map((img, i) => (
-              <div key={i} className="group relative h-28 rounded-xl overflow-hidden border border-white/20 transition-all hover:scale-105 hover:border-[#D4AF37]/50">
-                <img src={img.src} alt={img.cat} className="w-full h-full object-cover brightness-50 group-hover:brightness-100 transition-all duration-700" />
+              <div
+                key={i}
+                className="group relative h-28 rounded-xl overflow-hidden border border-white/20 transition-all hover:scale-105 hover:border-[#D4AF37]/50"
+              >
+                <img
+                  src={img.src}
+                  alt={img.cat}
+                  className="w-full h-full object-cover brightness-50 group-hover:brightness-100 transition-all duration-700"
+                />
               </div>
             ))}
           </div>
@@ -116,11 +144,18 @@ const RegisterPage = () => {
       </div>
 
       {/* Right Side: Slim Luxury Terminal */}
-      <div className="flex-1 flex items-center justify-center p-8 lg:p-12 bg-gradient-to-b from-black to-[#1a0000] relative">
-        <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: `radial-gradient(#FF0000 0.5px, transparent 0.5px)`, backgroundSize: '32px 32px' }}></div>
+      <div className="flex-1 flex items-center justify-center p-8 lg:p-12 bg-gradient-to-b from-background to-[#1a0000] relative">
+        <div
+          className="absolute inset-0 opacity-[0.05]"
+          style={{
+            backgroundImage: `radial-gradient(#FF0000 0.5px, transparent 0.5px)`,
+            backgroundSize: "32px 32px",
+          }}
+        ></div>
 
-        <div className={`w-full max-w-[340px] bg-[#050505]/80 backdrop-blur-3xl border border-white/5 shadow-[0_50px_100px_-20px_rgba(0,0,0,1)] relative overflow-hidden rounded-[2.5rem] transition-all duration-1000 delay-500 ${mounted ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-10 opacity-0 scale-95'}`}>
-
+        <div
+          className={`w-full max-w-[340px] bg-[#050505]/80 backdrop-blur-3xl border border-white/5 shadow-[0_50px_100px_-20px_rgba(0,0,0,1)] relative overflow-hidden rounded-[2.5rem] transition-all duration-1000 delay-500 ${mounted ? "translate-y-0 opacity-100 scale-100" : "translate-y-10 opacity-0 scale-95"}`}
+        >
           <div className="h-px w-full bg-gradient-to-r from-transparent via-[#FF0000] to-transparent" />
 
           <div className="space-y-3 pt-10 pb-4 text-center px-8">
@@ -128,8 +163,12 @@ const RegisterPage = () => {
               <Sparkles className="h-6 w-6 text-[#FF0000]" />
             </div>
             <div className="space-y-1">
-              <h2 className="text-2xl font-bold tracking-tight text-white uppercase italic">Join Consortium</h2>
-              <p className="text-white/40 text-[9px] font-bold uppercase tracking-[0.3em]">Identity Authentication</p>
+              <h2 className="text-2xl font-bold tracking-tight text-white uppercase italic">
+                Join Consortium
+              </h2>
+              <p className="text-white/40 text-[9px] font-bold uppercase tracking-[0.3em]">
+                Identity Authentication
+              </p>
             </div>
           </div>
 
@@ -142,7 +181,9 @@ const RegisterPage = () => {
               )}
 
               <div className="space-y-1">
-                <label className="text-[9px] font-black text-white/50 uppercase tracking-[0.4em] pl-1">Organization ID</label>
+                <label className="text-[9px] font-black text-white/50 uppercase tracking-[0.4em] pl-1">
+                  Organization ID
+                </label>
                 <Input
                   name="organizationName"
                   placeholder="ENTER NAME"
@@ -154,7 +195,9 @@ const RegisterPage = () => {
               </div>
 
               <div className="space-y-1">
-                <label className="text-[9px] font-black text-white/50 uppercase tracking-[0.4em] pl-1">Liaison Email</label>
+                <label className="text-[9px] font-black text-white/50 uppercase tracking-[0.4em] pl-1">
+                  Liaison Email
+                </label>
                 <Input
                   name="ownerEmail"
                   type="email"
@@ -167,7 +210,9 @@ const RegisterPage = () => {
               </div>
 
               <div className="space-y-1">
-                <label className="text-[9px] font-black text-white/50 uppercase tracking-[0.4em] pl-1">Secret Passcode</label>
+                <label className="text-[9px] font-black text-white/50 uppercase tracking-[0.4em] pl-1">
+                  Secret Passcode
+                </label>
                 <Input
                   name="password"
                   type="password"
@@ -180,7 +225,9 @@ const RegisterPage = () => {
               </div>
 
               <div className="space-y-1">
-                <label className="text-[9px] font-black text-white/50 uppercase tracking-[0.4em] pl-1">Confirm Identity</label>
+                <label className="text-[9px] font-black text-white/50 uppercase tracking-[0.4em] pl-1">
+                  Confirm Identity
+                </label>
                 <Input
                   name="confirmPassword"
                   type="password"
@@ -206,7 +253,13 @@ const RegisterPage = () => {
             <div className="w-full h-px bg-white/10" />
             <div className="text-center">
               <p className="text-[10px] text-white/40 font-bold uppercase tracking-[0.2em]">
-                Existing Partner? <Link to="/login" className="text-[#FF0000] hover:text-white transition-colors">Sign In</Link>
+                Existing Partner?{" "}
+                <Link
+                  to="/login"
+                  className="text-[#FF0000] hover:text-white transition-colors"
+                >
+                  Sign In
+                </Link>
               </p>
             </div>
           </div>

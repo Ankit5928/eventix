@@ -14,7 +14,7 @@
 @layer base {
   :root {
     /* Obsidian Smoke & Crimson Palette */
-    --background: 0 0% 0%; /* Pure Black */
+    --background: 222 24% 46%; /* Slate Blue #596891 */
     --foreground: 0 0% 100%; /* Pure White */
     --card: 0 0% 4%;
     --card-foreground: 0 0% 100%;
@@ -43,7 +43,7 @@
   }
 
   body {
-    @apply bg-black text-foreground font-sans antialiased;
+    @apply bg-background text-foreground font-sans antialiased;
     overflow-x: hidden;
   }
 
@@ -56,7 +56,7 @@
 
   /* Obsidian Page Container - Deep Gradient */
   .premium-page-container {
-    @apply min-h-screen w-full relative overflow-hidden bg-gradient-to-b from-[#000000] via-[#050000] to-[#1a0000] text-white;
+    @apply min-h-screen w-full relative overflow-hidden bg-gradient-to-b from-background via-background/70 to-[#1a0000] text-white;
     font-family: 'Inter', sans-serif;
   }
 
@@ -110,7 +110,7 @@
   }
 
   .custom-scrollbar::-webkit-scrollbar-track {
-    @apply bg-black/50;
+    @apply bg-background/50;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {

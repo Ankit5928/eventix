@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
-import { createPortal } from 'react-dom'; // Required for teleporting the modal
-import { cn } from './Button';
-import { X, Sparkles } from 'lucide-react';
+import React, { useEffect } from "react";
+import { createPortal } from "react-dom"; // Required for teleporting the modal
+import { cn } from "./Button";
+import { X, Sparkles } from "lucide-react";
 
 interface ModalProps {
   isOpen: boolean;
@@ -12,15 +12,22 @@ interface ModalProps {
   className?: string;
 }
 
-export function Modal({ isOpen, onClose, title, description, children, className }: ModalProps) {
+export function Modal({
+  isOpen,
+  onClose,
+  title,
+  description,
+  children,
+  className,
+}: ModalProps) {
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     }
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     };
   }, [isOpen]);
 
@@ -31,17 +38,17 @@ export function Modal({ isOpen, onClose, title, description, children, className
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-8 outline-none">
       {/* Cinematic Backdrop */}
       <div
-        className="fixed inset-0 bg-black/90 backdrop-blur-md animate-in fade-in duration-300"
+        className="fixed inset-0 bg-background/90 backdrop-blur-md animate-in fade-in duration-300"
         onClick={onClose}
       />
 
       <div
         className={cn(
-          "relative w-full max-w-xl bg-gradient-to-b from-[#1A0000] to-[#0A0000]",
+          "relative w-full max-w-xl bg-gradient-to-b from-background/20 to-background/10",
           "rounded-[2.5rem] border border-white/10 shadow-[0_0_100px_rgba(0,0,0,1)]",
           "animate-in zoom-in-95 fade-in duration-300 flex flex-col",
           "max-h-[85vh] overflow-hidden",
-          className
+          className,
         )}
       >
         {/* Top Accent Trace */}
@@ -59,10 +66,20 @@ export function Modal({ isOpen, onClose, title, description, children, className
           <div className="flex flex-col space-y-2 text-left">
             <div className="flex items-center gap-2 mb-1">
               <Sparkles className="h-4 w-4 text-[#FF3333] animate-pulse" />
-              <span className="text-[9px] font-black uppercase tracking-[0.4em] text-white/30">System Prompt</span>
+              <span className="text-[9px] font-black uppercase tracking-[0.4em] text-white/30">
+                System Prompt
+              </span>
             </div>
-            {title && <h2 className="text-2xl font-bold tracking-tighter italic text-white leading-tight uppercase">{title}</h2>}
-            {description && <p className="text-xs font-light italic text-white/40 border-l border-[#FF3333]/30 pl-4">{description}</p>}
+            {title && (
+              <h2 className="text-2xl font-bold tracking-tighter italic text-white leading-tight uppercase">
+                {title}
+              </h2>
+            )}
+            {description && (
+              <p className="text-xs font-light italic text-white/40 border-l border-[#FF3333]/30 pl-4">
+                {description}
+              </p>
+            )}
           </div>
         </div>
 
@@ -75,6 +92,6 @@ export function Modal({ isOpen, onClose, title, description, children, className
         <div className="absolute bottom-[-40px] left-1/2 -translate-x-1/2 w-48 h-24 bg-[#FF3333]/10 blur-[50px] pointer-events-none" />
       </div>
     </div>,
-    document.body // Teleport destination
+    document.body, // Teleport destination
   );
 }

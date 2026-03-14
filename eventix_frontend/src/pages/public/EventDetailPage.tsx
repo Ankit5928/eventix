@@ -81,7 +81,7 @@ export default function EventDetailPage() {
 
   if (loading) {
     return (
-      <div className="premium-page-container flex items-center justify-center bg-black">
+      <div className="premium-page-container flex items-center justify-center bg-background">
         <div className="smoke-overlay" />
         <div className="flex flex-col items-center gap-6">
           <div className="w-16 h-16 border-2 border-[#FF3333]/20 border-t-[#FF3333] rounded-full animate-spin" />
@@ -95,7 +95,7 @@ export default function EventDetailPage() {
 
   if (error || !event) {
     return (
-      <div className="premium-page-container flex items-center justify-center text-center px-4 bg-black">
+      <div className="premium-page-container flex items-center justify-center text-center px-4 bg-background">
         <div className="smoke-overlay" />
         <Card variant="premium" className="p-12 max-w-md border-white/10">
           <Info className="w-12 h-12 text-[#FF3333] mx-auto mb-6 opacity-50" />
@@ -115,7 +115,7 @@ export default function EventDetailPage() {
   }
 
   return (
-    <div className="premium-page-container pb-24 overflow-y-auto bg-black">
+    <div className="premium-page-container pb-24 overflow-y-auto bg-background">
       <div className="smoke-overlay pointer-events-none absolute inset-0" />
       <div className="premium-bg-overlay opacity-40 pointer-events-none absolute inset-0" />
 
@@ -131,11 +131,11 @@ export default function EventDetailPage() {
             alt={event.title}
           />
         ) : (
-          <div className="absolute inset-0 bg-[#1A0000] flex items-center justify-center">
+          <div className="absolute inset-0 bg-background/20 flex items-center justify-center">
             <Calendar className="h-32 w-32 text-[#FF3333]/5" />
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
 
         <div className="absolute top-10 left-10 z-20">
           <button
@@ -262,7 +262,7 @@ export default function EventDetailPage() {
                           <Award className="h-8 w-8 text-[#FF3333]/10" />
                         </div>
                       )}
-                      <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md border border-white/10 text-[#FF3333] text-[10px] font-black px-2.5 py-1 rounded-full">
+                      <div className="absolute top-3 right-3 bg-background/60 backdrop-blur-md border border-white/10 text-[#FF3333] text-[10px] font-black px-2.5 py-1 rounded-full">
                         ${item.minPrice}+
                       </div>
                     </div>
@@ -367,7 +367,7 @@ export default function EventDetailPage() {
                 </div>
               </CardContent>
 
-              <div className="bg-black/40 p-5 text-center border-t border-white/5">
+              <div className="bg-background/40 p-5 text-center border-t border-white/5">
                 <p className="text-[9px] text-white/20 tracking-[0.1em] italic font-medium">
                   Final cost includes all premium service allocations.
                 </p>

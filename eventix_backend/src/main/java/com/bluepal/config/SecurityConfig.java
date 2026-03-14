@@ -35,30 +35,29 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
 
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint((request, response, authException) ->
-                                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized"))
-                )
+                        .authenticationEntryPoint((request, response, authException) -> response
+                                .sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")))
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/api/v1/public/**").permitAll()
                         .requestMatchers("/api/v1/payments/**").permitAll()
+                        // Allow guest users to manage reservation checkout flow (reserve + attendee
+                        // update + summary + status)
+                        .requestMatchers("/api/v1/events/reservations/**").permitAll()
                         .requestMatchers("/api/v1/tickets/my-tickets").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .anyRequest().authenticated()
-                )
+                        .anyRequest().authenticated())
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setContentType("application/json");
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                            response.getWriter().write("{\"error\": \"Unauthorized\", \"message\": \"" + authException.getMessage() + "\"}");
-                        })
-                )
+                            response.getWriter().write("{\"error\": \"Unauthorized\", \"message\": \""
+                                    + authException.getMessage() + "\"}");
+                        }))
 
                 .addFilterBefore(jwtAuthFilter,
                         UsernamePasswordAuthenticationFilter.class);
@@ -75,7 +74,6 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
-
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {

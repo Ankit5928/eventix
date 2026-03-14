@@ -30,8 +30,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain
-    ) throws ServletException, IOException {
+            @NonNull FilterChain filterChain) throws ServletException, IOException {
 
         String authHeader = request.getHeader("Authorization");
         String jwt = null;
@@ -55,28 +54,27 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             if (jwtUtil.validateToken(jwt)) {
                 // EM-AUTH-003-T22: Extract Organization Context for RLS
-                List<Long> orgIds = jwtUtil.extractOrgIds(jwt);
-
-                // For this request, we use the first Org ID or a header-specified ID
-                // In a production multi-org scenario, the frontend usually sends
-                // an 'X-Organization-Id' header to pick which context to use.
+                // Priority: X-Organization-Id header -> activeOrgId claim -> first orgId in
+                // token
                 String headerOrgId = request.getHeader("X-Organization-Id");
                 if (headerOrgId != null) {
                     OrganizationContextHolder.setOrgId(Long.parseLong(headerOrgId));
-                } else if (orgIds != null && !orgIds.isEmpty()) {
-                    OrganizationContextHolder.setOrgId(orgIds.get(0));
+                } else {
+                    Long activeOrgId = jwtUtil.extractActiveOrgId(jwt);
+                    if (activeOrgId != null) {
+                        OrganizationContextHolder.setOrgId(activeOrgId);
+                    }
                 }
 
                 List<String> jwtRoles = jwtUtil.extractRoles(jwt);
                 List<SimpleGrantedAuthority> authorities = jwtRoles != null ? jwtRoles.stream()
                         .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                         .collect(Collectors.toList()) : List.of(new SimpleGrantedAuthority("ROLE_USER"));
-                        
+
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,
-                        authorities
-                );
+                        authorities);
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
